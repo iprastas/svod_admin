@@ -1,0 +1,95 @@
+﻿@page
+@model svod_admin.Pages.Target.CreateTarUserModel
+@{
+    ViewData["Title"] = "Создание пользователя МЖКХ";
+
+    Dictionary<int, string> forms = Pg.forms;
+    Dictionary<int, bool> formsbool = Pg.formsbool;
+
+    var icanflags = new Dictionary<ulong, string>()
+    {
+        { 0x00000001U, "я могу изменить введённые данные моего субъекта"},
+        { 0x00000002U, "я могу изменить данные моих подчинённых субъектов"},
+        { 0x00000004U, "я могу изменить данные субъектов моей территории"},
+        { 0x00000008U, "я могу изменить данные любых субъектов"},
+        { 0x00000010U, "я могу смотреть вводные формы данных"},
+        { 0x00000020U, "я могу смотреть аналитические формы данных"},
+        { 0x00000040U, "я могу смотреть первичные данные"},
+        { 0x00000100U, "я могу редактировать реестр территорий"},
+        { 0x00000200U, "я могу редактировать реестр субъектов"},
+        { 0x00000400U, "я могу редактировать реестр объектов"},
+        { 0x10000000U, "я могу копировать данные"},
+        { 0x20000000U, "я могу редактировать пользователей и их права"},
+        { 0x40000000U, "я могу редактировать пераметры"},
+        { 0x80000000U, "я могу смотреть устаревшие формы"}
+    };
+
+    var icanflagsbool = new Dictionary<ulong, bool>();
+    foreach (var flag in icanflags)
+    {
+        icanflagsbool.Add(flag.Key, false);
+    }
+}
+
+<div class="container-fluid">
+    <form method="post" class="row g-3">
+        <div class="col-md-3">
+            <label for="validationDefault01" class="form-label">Логин</label>
+            <input type="text" class="form-control" name="Login" id="validationDefault01" required>
+        </div>
+        <div class="col-md-3">
+            <label for="validationDefault02" class="form-label">Пароль</label>
+            <input type="text" class="form-control" name="Password" id="validationDefault02" required>
+        </div>
+        <div class="col-md-3">
+            <label for="Passwordupto" class="form-label">Действует до..</label>
+            <input type="date" class="form-control" name="Passwordupto" id="Passwordupto">
+        </div>
+        <div class="col-md-3">
+            <label for="inputTerritory" class="form-label">Терриория</label>
+            <input type="text" class="form-control" name="Territory" id="inputTerritory" placeholder="Республика Башкортостан" readonly>
+        </div>
+        <div class="col-md-3">
+            <label for="inputDepartment" class="form-label">Департамент</label>
+            <input type="text" class="form-control" name="Department" id="inputDepartment">
+        </div>
+        <div class="col-md-3">
+            <label for="inputAddress2" class="form-label">Имя</label>
+            <input type="text" class="form-control" name="Name" id="inputAddress2" placeholder="ФИО">
+        </div>
+        <div class="col-md-3">
+            <label for="inputNote" class="form-label">Заметки</label>
+            <input type="text" class="form-control" name="Note" id="inputNote">
+        </div>
+        <div class="row permissions">
+            <div class="col">
+                <label for="inputFlags" class="form-label">Виды форм</label>
+                @foreach (var flag in formsbool)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Fkinds" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @flag.Key - @forms[flag.Key]
+                        </label>
+                    </div>
+                }
+            </div>
+            <div class="col">
+                <label for="inputFlags" class="form-label">Разрешения</label>
+                @foreach (var flag in icanflagsbool)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Cflags" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @icanflags[flag.Key]
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" asp-page-handler="create" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+        </div>
+    </form>
+</div>

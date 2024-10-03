@@ -1,0 +1,45 @@
+﻿@page "{login}, {subjectid}"
+@model svod_admin.Pages.Subject.CreateSubFormModel
+@{
+    ViewData["Title"] = "Добавление форм и прав";
+}
+
+<div class="container-fluid">
+    <div class="col-auto me-auto">
+        <input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
+    </div>
+    <form method="post" class="g-3">
+        <select multiple="multiple" class="multi-select" id="form_list" asp-for="Forms.forms" asp-items="Model.Items" size="20"></select>
+        <div class="col">
+            <label for="inputFlags" class="form-label">Разрешения</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="permission" id="flexCheckDefault" value="0">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Запрет
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="permission" id="flexCheckDefault" value="1">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Просмотр
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="permission" id="flexCheckDefault" value="2">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Изменение
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="permission" id="flexCheckDefault" value="3">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Безусловное изменение
+                </label>
+            </div>
+        </div>
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" asp-page-handler="create" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+        </div>
+    </form>
+</div>

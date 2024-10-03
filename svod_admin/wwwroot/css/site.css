@@ -1,0 +1,95 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    background-image: -webkit-linear-gradient(195deg, #eefefe, #bbccff);
+    background-image: -o-linear-gradient(195deg, #eefefe, #bbccff);
+    background-image: linear-gradient(-105deg, #eefefe, #bbccff);
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+}
+
+.form-select {
+    max-width: 65vw;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.container {
+    margin-left: 0px;
+    margin-right: 0px;
+    /*increase width as per your need*/
+    max-width: 1800px;
+}
+
+.container-fluid {
+    height: 80vh;
+    width: 100%;
+}
+
+.table {
+    padding-top: 20px;
+    height: inherit;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 1px;
+    background-color: #FFF;
+    background-color: rgba(255,255,255,1);
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    position: sticky;
+    top: 0;
+}
+
+.table > :not(caption) > * > * {
+    background-color: white;
+}
+
+.head {
+    padding-bottom: 15px;
+}
+
+.editform {
+    padding-top: 15px;
+}
+
+.permissions {
+    padding-top: 15px;
+}
+
+.actions {
+    margin: 5px;
+    display: flex;
+}
+
+.active {
+    background-color: lightgray;
+}
+
+

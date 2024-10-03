@@ -1,0 +1,35 @@
+﻿@page "{formid}"
+@model svod_admin.Pages.Form.EditFormModel
+@{
+    ViewData["Title"] = "Изменение срока действия формы";
+}
+
+<div class="container-fluid">
+    <form method="post" class="row g-3 editform">
+        <div class="col-md-3">
+            <label for="validationDefault01" class="form-label">Родитель</label>
+            <input type="text" class="form-control" name="Login" id="validationDefault01" value="@Model.MotherName" readonly>
+        </div>
+        <div class="col-md-9">
+            <label for="validationDefault01" class="form-label">Название</label>
+            <input type="text" class="form-control" name="Login" id="validationDefault01" value="@Model.FormName" required>
+        </div>
+        <div class="col-md-3">
+            <label for="Regulations" class="form-label">Регламент ввода форм</label>
+            <select class="form-select" asp-for="@Model.Regulations" name="Regulations" asp-items="@Model.ListOfRegulations"></select>
+        </div>
+        <div class="col-md-3">
+            <label for="Passwordupto" class="form-label">Действует c..</label>
+            <input type="date" class="form-control" name="UptoDate" id="UptoDate" asp-for="@Model.FormDate" readonly>
+        </div>
+        <div class="col-md-3">
+            <label for="Passwordupto" class="form-label">Действует до..</label>
+            <input type="date" class="form-control" name="UptoDate" id="UptoDate" asp-for="@Model.UptoDate">
+        </div>
+        
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" asp-page-handler="edit" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+        </div>
+    </form>
+</div>

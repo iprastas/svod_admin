@@ -1,0 +1,67 @@
+﻿@page "{login}, {subjectid}"
+@model svod_admin.Pages.Subject.SubjectFinegrainedModel
+@{
+    ViewData["Title"] = "Формы муниципалов";
+}
+
+<div class="container-fluid">
+    <div class="row head">
+        <div class="col-auto me-auto">
+            <input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
+        </div>
+        <div class="col-auto">
+            <form method="post">
+                <button type="submit" asp-page-handler="create" class="btn btn-success add-us">Добавить форму</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row table">
+        <form method="post">
+            <table class="table table-hover" id="tuser-tbl">
+                <thead>
+                    <tr>
+                        <th scope="col">№</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">название формы</th>
+                        <th scope="col">предприятие</th>
+                        <th scope="col">логин</th>
+                        <th scope="col">разрешения</th>
+                        <th scope="col">username</th>
+                        <th scope="col">дата</th>
+                        <th scope="col">действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var us in Model.list)
+                    {
+                        <tr>
+                            <td>@us.Num</td>
+                            <td>@us.FormID</td>
+                            <td>@us.FormName</td>
+                            <td>@us.Subject</td>
+                            <td>@us.Login</td>
+                            <td>
+                                <select class="form-select" asp-for="@us.Permission" name="Permission" asp-items="Model.ListOfPermiss"></select>
+                            </td>
+                            <td>@us.Username</td>
+                            <td>@us.ChangeDate</td>
+                            <td>
+                                <button type="submit" asp-page-handler="edit" asp-route-formid="@us.FormID" asp-route-login="@us.Login" asp-route-subjectid="@us.SubjectID" asp-route-number="@us.Num" class="btn btn-outline-success actions" title="Изменить">
+                                    <span>
+                                        <img src="~/pencil-square.svg">
+                                    </span>
+                                </button>
+                                <button type="submit" asp-page-handler="delete" asp-route-login="@us.Login" asp-route-formid="@us.FormID" asp-route-subjectid="@us.SubjectID" class="btn btn-outline-success actions" title="Удалить">
+									<span>
+										<img src="~/trash3.svg">
+									</span>
+								</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

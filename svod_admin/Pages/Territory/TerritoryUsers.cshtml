@@ -1,0 +1,78 @@
+﻿@page
+@model svod_admin.Pages.Territory.TerritoryUsersModel
+@{
+    ViewData["Title"] = "Администрации МР";
+}
+
+<div class="container-fluid">
+    <div class="row head">
+        <div class="col-auto me-auto">
+            <input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
+        </div>
+    </div>
+
+    <div class="row table">
+        <form method="post">
+            <table class="table table-hover" id="tuser-tbl">
+                <thead>
+                    <tr>
+                        <th scope="col">логин</th>
+                        <th scope="col">пароль</th>
+                        <th scope="col">до..</th>
+                        <th scope="col">АТЕ</th>
+                        <th scope="col">название</th>
+                        <th scope="col">примечание</th>
+                        <th scope="col">виды форм</th>
+                        <th scope="col">формы</th>
+                        <th scope="col">разрешения</th>
+                        <th scope="col">изменял</th>
+                        <th scope="col">username</th>
+                        <th scope="col">дата</th>
+                        <th scope="col">действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var us in Model.list)
+                    {
+                        <tr>
+                            <td>@us.login</td>
+                            <td>@us.password</td>
+                            <td>@us.passwordupto</td>
+                            <td>@us.id - @us.subjectname</td>
+                            <td>@us.subjectname</td>
+                            <td>@us.note</td>
+                            <td>@us.myformkinds</td>
+                            <td>@us.myforms</td>
+                            <td>@us.icanflags</td>
+                            <td>@us.changer</td>
+                            <td>@us.username</td>
+                            <td>@us.changedate</td>
+                            <td>
+                                @if (@us.login == null||string.IsNullOrEmpty(us.login))
+                                {
+                                    <button type="submit" asp-page-handler="create" asp-route-id="@us.id" class="btn btn-outline-success actions" title="Создать">
+                                        <span>
+                                            <img src="~/person-plus.svg">
+                                        </span>
+                                    </button>
+                                }
+                                else{
+                                    <button type="submit" asp-page-handler="edit" asp-route-login="@us.login" asp-route-id="@us.id" class="btn btn-outline-success actions" title="Изменить">
+                                        <span>
+                                            <img src="~/pencil-square.svg">
+                                        </span>
+                                    </button>
+                                    <button type="submit" asp-page-handler="form" asp-route-login="@us.login" asp-route-territoryid="@us.id" class="btn btn-outline-success actions" title="Настройка форм">
+                                        <span>
+                                            <img src="~/card-text.svg">
+                                        </span>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

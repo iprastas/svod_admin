@@ -1,0 +1,140 @@
+﻿@page "{login}, {id}"
+@model svod_admin.Pages.EditTerUserModel
+@{
+
+    ViewData["Title"] = "Изменение пользователя";
+
+    Dictionary<int, string> forms = Pg.forms;
+    Dictionary<int, bool> formsbool = Pg.formsbool;
+
+
+    int[] myFormsKinds;
+    using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(Model.ConnectionString))
+    {
+        conn.Open();
+        Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+        cmd.CommandText = "select t.territory,k.short||t.name,tu.* from territory t "
+        + " left outer join territoryusers tu on t.territory=tu.territory"
+        + " left outer join territorykind k on t.territorykind=k.territorykind"
+        + $" where tu.territory='{RouteData.Values["id"]}' and tu.login='{RouteData.Values["login"]}'";
+        Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            if (!reader.IsDBNull(0))
+                Model.Id = reader.GetInt32(0);
+            if (!reader.IsDBNull(1))
+                Model.SubjectName = reader.GetString(1);
+            if (!reader.IsDBNull(3))
+                Model.Login = reader.GetString(3);
+            if (!reader.IsDBNull(4))
+                Model.Note = reader.GetString(4);
+            if (!reader.IsDBNull(5))
+                Model.Password = reader.GetString(5);
+            if (!reader.IsDBNull(6))
+                Model.Passwordupto = reader.GetDateTime(6);
+            if (!reader.IsDBNull(7))
+                Model.Myformkinds = reader.GetString(7);
+            if (!reader.IsDBNull(8))
+                Model.Myforms = reader.GetString(8);
+            if (!reader.IsDBNull(9))
+                Model.icanFlags = (ulong)reader.GetInt64(9);
+            if (!reader.IsDBNull(10))
+                Model.Changer = reader.GetString(10);
+            if (!reader.IsDBNull(11))
+                Model.Username = reader.GetString(11);
+            
+            if (!string.IsNullOrEmpty(Model.Myformkinds))
+            {
+                myFormsKinds = Model.Myformkinds.Split(',').Select(snum => int.Parse(snum)).ToArray();
+                foreach (var i in myFormsKinds)
+                {
+                    if (i < 5 && i > 0)
+                    {
+                        formsbool[i] = true;
+                    }
+                }
+            }
+        }
+        conn.Close();
+    }
+
+    var icanflags = new Dictionary<ulong, string>()
+    {
+        { 0x00000001U, "я могу изменить введённые данные моего субъекта"},
+        { 0x00000002U, "я могу изменить данные моих подчинённых субъектов"},
+        { 0x00000004U, "я могу изменить данные субъектов моей территории"},
+        { 0x00000008U, "я могу изменить данные любых субъектов"},
+        { 0x00000010U, "я могу смотреть вводные формы данных"},
+        { 0x00000020U, "я могу смотреть аналитические формы данных"},
+        { 0x00000040U, "я могу смотреть первичные данные"},
+        { 0x00000100U, "я могу редактировать реестр территорий"},
+        { 0x00000200U, "я могу редактировать реестр субъектов"},
+        { 0x00000400U, "я могу редактировать реестр объектов"},
+        { 0x10000000U, "я могу копировать данные"},
+        { 0x20000000U, "я могу редактировать пользователей и их права"},
+        { 0x40000000U, "я могу редактировать пераметры"},
+        { 0x80000000U, "я могу смотреть устаревшие формы"}
+    };
+
+    var icanflagsbool = new Dictionary<ulong, bool>();
+    foreach (var flag in icanflags)
+    {
+        icanflagsbool.Add(flag.Key, (Model.icanFlags & flag.Key) != 0);
+    }
+}
+
+<div class="container-fluid">
+    <form method="post" class="row g-3 editform">
+        <div class="row">
+            <div class="col-4">
+                <label for="validationDefault01" class="form-label">Территория</label>
+                <input type="text" class="form-control" name="Id" id="validationDefault01" value="@Model.Id - @Model.SubjectName" readonly>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="validationDefault01" class="form-label">Логин</label>
+            <input type="text" class="form-control" name="Login" id="validationDefault01" value="@Model.Login" required>
+        </div>
+        <div class="col-md-3">
+            <label for="validationDefault" class="form-label">Пароль</label>
+            <input type="text" class="form-control" name="Password" id="validationDefaul" value="@Model.Password" required>
+        </div>
+        <div class="col-md-3">
+            <label for="Passwordupto" class="form-label">Действует до..</label>
+            <input type="date" class="form-control" name="Passwordupto" id="Passwordupto" asp-for="@Model.Passwordupto">
+        </div>
+        <div class="col-md-3">
+            <label for="inputNote" class="form-label">Заметки</label>
+            <input type="text" class="form-control" name="Note" id="inputNote" value="@Model.Note">
+        </div>
+        <div class="row permissions">
+            <div class="col">
+                <label for="inputFlags" class="form-label">Виды форм</label>
+                @foreach (var flag in formsbool)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Fkinds" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @flag.Key - @forms[flag.Key]
+                        </label>
+                    </div>
+                }
+            </div>
+            <div class="col">
+                <label for="inputFlags" class="form-label">Разрешения</label>
+                @foreach (var flag in icanflagsbool)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Cflags" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @icanflags[flag.Key]
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" asp-page-handler="edit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
+</div>

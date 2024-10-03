@@ -1,0 +1,49 @@
+﻿@page
+@model svod_admin.Pages.Form.FormListModel
+@{
+    ViewData["Title"] = "Список форм";
+}
+
+<div class="container-fluid">
+    <div class="row head">
+        <div class="col-auto me-auto">
+            <input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
+        </div>
+    </div>
+
+    <div class="row table">
+        <form method="post">
+            <table class="table table-hover table_form" id="tuser-tbl">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Родитель</th>
+                        <th scope="col">Название формы</th>
+                        <th scope="col">Действует c..</th>
+                        <th scope="col">Действует до..</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var us in Model.list)
+                    {
+                        <tr>
+                            <td>@us.FormID</td>
+                            <td>@us.MotherID @us.MotherName</td>
+                            <td>@us.FormName</td>
+                            <td>@us.FormDate</td>
+                            <td>@us.UptoDate</td>
+                            <td>
+                                <button type="submit" asp-page-handler="edit" asp-route-formid="@us.FormID" class="btn btn-outline-success actions" title="Изменить">
+                                    <span>
+                                        <img src="~/pencil-square.svg">
+                                    </span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
