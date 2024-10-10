@@ -100,10 +100,10 @@
                 <input type="text" class="form-control" name="Login" id="LoginInput" value="@Model.Login" required>
             </div>
             <div class="col-md-2">
-                <label for="disabledTextInput" class="form-label">Пароль</label>
-                <div class="row">
-                    <input type="text" class="form-control" name="Password" id="disabledTextInput" value="@Model.Password" disabled>
-                    <button type="button" class="btn btn-primary btn-sm">Сгенерировать пароль</button>
+                <label for="Password" class="form-label">Пароль</label>
+                <div class="input-group mb-3">
+                    <button class="btn btn-success" type="button" asp-page-handler="edit" id="Password">Сгенерировать</button>
+                    <input type="text" class="form-control" name="Password" value="@Model.Password" disabled placeholder="" aria-label="Сгенерированный пароль" aria-describedby="button-addon1">
                 </div>
             </div>
         </div>
