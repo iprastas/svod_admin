@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
 using NpgsqlTypes;
+using System.Text;
+using System;
 using System.Xml.Linq;
 
 namespace svod_admin.Pages.Subject
@@ -45,6 +47,32 @@ namespace svod_admin.Pages.Subject
             return Redirect("/Subject/SubjectUsers");
         }
 
+        public void OnPostGenerate()
+        {
+            StringBuilder password = new ();
+            password.Append(Pg.UppercaseLetters[Pg.random.Next(Pg.UppercaseLetters.Length)]);
+            password.Append(Pg.LowercaseLetters[Pg.random.Next(Pg.LowercaseLetters.Length)]);
+            password.Append(Pg.Numbers[Pg.random.Next(Pg.Numbers.Length)]);
+            password.Append(Pg.SpecialCharacters[Pg.random.Next(Pg.SpecialCharacters.Length)]);
+
+            // Fill the remaining length of the password with random characters from all categories.
+            string allCharacters = Pg.UppercaseLetters + Pg.LowercaseLetters + Pg.Numbers + Pg.SpecialCharacters;
+            for (int i = 4; i < 12; i++)
+            {
+                password.Append(allCharacters[Pg.random.Next(allCharacters.Length)]);
+            }
+
+            char[] passwordArray = password.ToString().ToCharArray();
+            for (int i = 0; i < passwordArray.Length; i++)
+            {
+                int j = Pg.random.Next(i, passwordArray.Length);
+                // Swap characters at positions i and j.
+                (passwordArray[j], passwordArray[i]) = (passwordArray[i], passwordArray[j]);
+            }
+
+            Password = password.ToString();
+        }
+
         public IActionResult OnPostEdit()
         {
             string myFormkinds = "";
@@ -69,8 +97,7 @@ namespace svod_admin.Pages.Subject
                 IcanFlags = 0;
             }
 
-            string connectionString = "Host=localhost;Username=svod2;Password=svod2;Database=svod2";
-            using (NpgsqlConnection update = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection update = new (connectionString))
             {
                 update.Open();
                 using (NpgsqlCommand cmd = update.CreateCommand())

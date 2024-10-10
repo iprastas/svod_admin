@@ -8,28 +8,33 @@ namespace svod_admin
         public static string? connStr;
         public static readonly Dictionary<int, string> forms = new Dictionary<int, string>();
         public static Dictionary<int, bool> formsbool = new Dictionary<int, bool>();
+
+        public static readonly Random random = new Random();
+        public const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public const string LowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        public const string Numbers = "0123456789";
+        public const string SpecialCharacters = "!@#$%^&*()_-+=<>?";
+
         public  Pg(IConfiguration configuration)
         {
             config = configuration;
             connStr = configuration.GetConnectionString("DefaultConnection");
 
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(Pg.connStr))
+            using Npgsql.NpgsqlConnection conn = new(Pg.connStr);
+            conn.Open();
+            Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT formkind, short FROM svod2.formkind Where formkind > 0 and formkind < 5 ORDER BY formkind ASC";
+            Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT formkind, short FROM svod2.formkind Where formkind > 0 and formkind < 5 ORDER BY formkind ASC";
-                Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    int i = reader.GetInt32(0);
-                    string s = reader.GetString(1);
-                    bool fl = false;
+                int i = reader.GetInt32(0);
+                string s = reader.GetString(1);
+                bool fl = false;
 
-                    forms.Add(i, s);
-                    formsbool.Add(i, fl);
-                }
-                conn.Close();
+                forms.Add(i, s);
+                formsbool.Add(i, fl);
             }
+            conn.Close();
         }
 
     }

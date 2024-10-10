@@ -8,7 +8,7 @@
     Dictionary<int, bool> formsbool = Pg.formsbool;
 
     int[] myFormsKinds;
-    using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(Model.connectionString))
+    using (Npgsql.NpgsqlConnection conn = new (Model.connectionString))
     {
         conn.Open();
         Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
@@ -91,18 +91,21 @@
 <div class="container-fluid">
     <form method="post" class="row g-3 editform">
         <div class="row">
-            <div class="col-4">
-                <label for="validationDefault01" class="form-label">Id предприятия</label>
-                <input type="text" class="form-control" name="Id" id="validationDefault01" value="@Model.Id" readonly>
+            <div class="col-2">
+                <label for="IdInput" class="form-label">Id предприятия</label>
+                <input type="text" class="form-control" name="Id" id="IdInput" value="@Model.Id" readonly>
             </div>
-        </div>
-        <div class="col-md-3">
-            <label for="validationDefault01" class="form-label">Логин</label>
-            <input type="text" class="form-control" name="Login" id="validationDefault01" value="@Model.Login" required>
-        </div>
-        <div class="col-md-3">
-            <label for="validationDefault" class="form-label">Пароль</label>
-            <input type="text" class="form-control" name="Password" id="validationDefaul" value="@Model.Password" required>
+            <div class="col-md-2">
+                <label for="LoginInput" class="form-label">Логин</label>
+                <input type="text" class="form-control" name="Login" id="LoginInput" value="@Model.Login" required>
+            </div>
+            <div class="col-md-2">
+                <label for="disabledTextInput" class="form-label">Пароль</label>
+                <div class="row">
+                    <input type="text" class="form-control" name="Password" id="disabledTextInput" value="@Model.Password" disabled>
+                    <button type="button" class="btn btn-primary btn-sm">Сгенерировать пароль</button>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
             <label for="Passwordupto" class="form-label">Действует до..</label>
