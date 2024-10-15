@@ -69,7 +69,7 @@ namespace svod_admin.Pages.Target
                 IcanFlags = 0;
             }
 
-            using (NpgsqlConnection update = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection update = new (connectionString))
             {
                 update.Open();
                 using (NpgsqlCommand cmd = update.CreateCommand())

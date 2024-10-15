@@ -22,11 +22,14 @@ namespace svod_admin.Pages.Territory
         [BindProperty] public List<ulong> Cflags { get; set; }
         [BindProperty] public string? Changer { get; set; } = "";
         [BindProperty] public string? Username { get; set; } = "";
-
-        public CreateTerUserModel()
+        [BindProperty] public string? connectionString { get; }
+        IConfiguration Configuration { get; set; }
+        public CreateTerUserModel(IConfiguration _configuration)
         {
-            Fkinds = new List<int>();
-            Cflags = new List<ulong>();
+            Fkinds = [];
+            Cflags = [];
+            Configuration = _configuration;
+            connectionString = Configuration.GetConnectionString("DefaultConnection");
         }
 
         public void OnGet()
@@ -63,13 +66,12 @@ namespace svod_admin.Pages.Territory
                 IcanFlags = 0;
             }
 
-            string connectionString = "Host=localhost;Username=svod2;Password=svod2;Database=svod2";
-            using (NpgsqlConnection ins = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection ins = new (connectionString))
             {
                 ins.Open();
                 string connINS = "INSERT INTO svod2.territoryusers VALUES ( @territory, @login, @note, @password, @passwordupto, " +
                     $"@myformkinds, @myforms, @icanflags, @changer, @username, @changedate)";
-                NpgsqlCommand plcom = new NpgsqlCommand(connINS, ins);
+                NpgsqlCommand plcom = new (connINS, ins);
                 plcom.Parameters.Add("@territory", NpgsqlDbType.Varchar).Value = Id;
                 plcom.Parameters.Add("@login", NpgsqlDbType.Varchar).Value = Login;
                 plcom.Parameters.Add("@note", NpgsqlDbType.Varchar).Value = Note != null ? Note : DBNull.Value;

@@ -72,7 +72,7 @@
         { 0x00000400U, "я могу редактировать реестр объектов"},
         { 0x10000000U, "я могу копировать данные"},
         { 0x20000000U, "я могу редактировать пользователей и их права"},
-        { 0x40000000U, "я могу редактировать пераметры"},
+        { 0x40000000U, "я могу редактировать параметры"},
         { 0x80000000U, "я могу смотреть устаревшие формы"}
     };
 
@@ -90,14 +90,17 @@
                 <label for="validationDefault01" class="form-label">Территория</label>
                 <input type="text" class="form-control" name="Id" id="validationDefault01" value="@Model.Id - @Model.SubjectName" readonly>
             </div>
-        </div>
-        <div class="col-md-3">
-            <label for="validationDefault01" class="form-label">Логин</label>
-            <input type="text" class="form-control" name="Login" id="validationDefault01" value="@Model.Login" required>
-        </div>
-        <div class="col-md-3">
-            <label for="validationDefault" class="form-label">Пароль</label>
-            <input type="text" class="form-control" name="Password" id="validationDefaul" value="@Model.Password" required>
+            <div class="col-md-2">
+                <label for="LoginInput" class="form-label">Логин</label>
+                <input type="text" class="form-control" name="Login" id="LoginInput" value="@Model.Login" required>
+            </div>
+            <div class="col-md-4">
+                <label for="Password" class="form-label">Пароль</label>
+                <div class="input-group mb-3">
+                    <button class="btn btn-success btn-generate-password" type="button" asp-page-handler="edit" id="Password">Сгенерировать</button>
+                    <input type="text" class="form-control" name="Password" value="@Model.Password" aria-label="Сгенерированный пароль" readonly>
+                </div>
+            </div>
         </div>
         <div class="col-md-3">
             <label for="Passwordupto" class="form-label">Действует до..</label>

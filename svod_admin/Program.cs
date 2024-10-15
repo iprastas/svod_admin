@@ -17,7 +17,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 options.SlidingExpiration = true;
             });
 builder.Services.AddAuthorization(); 
+builder.Services.AddControllers();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -30,6 +33,8 @@ new Pg(app.Configuration);
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.MapControllers();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

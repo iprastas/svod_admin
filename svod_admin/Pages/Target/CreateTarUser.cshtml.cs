@@ -59,13 +59,12 @@ namespace svod_admin.Pages.Target
                 IcanFlags = 0;
             }
 
-            string connectionString = "Host=localhost;Username=svod2;Password=svod2;Database=svod2";
-            using (NpgsqlConnection ins = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection ins = new (ConnectionString))
             {
                 ins.Open();
                 string connINS = "INSERT INTO svod2.targetusers VALUES (@login, @password, @passwordupto, @territory, @department, @name," +
                     $" @note, @myformkinds, @myforms, @icanflags, @changer, @username, @changedate)";
-                NpgsqlCommand plcom = new NpgsqlCommand(connINS, ins);
+                NpgsqlCommand plcom = new (connINS, ins);
                 plcom.Parameters.Add("@login", NpgsqlDbType.Varchar).Value = Login;
                 plcom.Parameters.Add("@password", NpgsqlDbType.Varchar).Value = Password;
                 plcom.Parameters.Add("@passwordupto", NpgsqlDbType.Timestamp).Value = Passwordupto != null ? Passwordupto : DBNull.Value;
