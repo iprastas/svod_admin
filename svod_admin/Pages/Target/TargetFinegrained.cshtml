@@ -1,4 +1,4 @@
-﻿@page "{login}"
+﻿@page "{login}.{message?}"
 @model svod_admin.Pages.Target.TargetFinegrainedModel
 @{
     ViewData["Title"] = "Формы МЖКХ";
@@ -45,9 +45,9 @@
                             <td>@us.Username</td>
                             <td>@us.ChangeDate</td>
                             <td>
-                                <button type="submit" asp-page-handler="edit" asp-route-formid="@us.FormID" asp-route-login="@us.Login" asp-route-number="@us.Num" class="btn btn-outline-success actions" title="Изменить">
+                                <button type="submit" asp-page-handler="edit" asp-route-formid="@us.FormID" asp-route-login="@us.Login" asp-route-number="@us.Num" class="btn btn-outline-success actions" title="Сохранить">
                                     <span>
-                                        <img src="~/pencil-square.svg">
+                                        <img src="~/save.svg">
                                     </span>
                                 </button>
                                 <button type="submit" asp-page-handler="delete" asp-route-formid="@us.FormID" asp-route-login="@us.Login" class="btn btn-outline-success actions" title="Удалить">
@@ -63,3 +63,58 @@
         </form>
     </div>
 </div>
+
+@if (!string.IsNullOrEmpty(@Model.Message))
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        @if (Model.Success)
+        {
+            <div class="toast text-white bg-success border-0"
+                 id="bottomToast"
+                 role="alert"
+                 aria-live="assertive"
+                 aria-atomic="true">
+
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @Model.Message
+                    </div>
+                    <button type="button"
+                            class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="toast text-white bg-danger border-0"
+                 id="bottomToast"
+                 role="alert"
+                 aria-live="assertive"
+                 aria-atomic="true">
+
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @Model.Message
+                    </div>
+                    <button type="button"
+                            class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        }
+    </div>
+}
+</>
+@section Scripts
+{
+    <script>
+        var toastElList = [].slice.call(document.querySelectorAll('#bottomToast'));
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl);
+        });
+        toastList.forEach(toast => toast.show());
+    </script>
+}

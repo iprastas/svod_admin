@@ -28,7 +28,9 @@ namespace svod_admin.Pages.Target
         [BindProperty] public int Permission { get; set; }
         [BindProperty] public string Username { get; set; } = "";
         [BindProperty] public DateTime? ChangeDate { get; set; }
-        
+        [BindProperty] public string? Message { get; set; } = "";
+        [BindProperty] public bool Success { get; set; }
+
         string? connectionString;
         public List<TargetFinegrainedModel> list = new();
         readonly IConfiguration? configuration;
@@ -40,6 +42,26 @@ namespace svod_admin.Pages.Target
         }
         public void OnGet()
         {
+            Message = Convert.ToString(RouteData.Values["Message"]);
+            if (Message != "")
+            {
+                var parts = Message.Split(' ');
+                Message = parts[0];
+                FormID = Convert.ToInt32(parts[1]);
+
+                switch (Message)
+                {
+                    case "success":
+                        Message = $"Успешно! Форма {FormID} изменена.";
+                        Success = true;
+                        break;
+                    case "error":
+                        Message = $"Ошибка! Форма {FormID} не была изменена.";
+                        Success = false;
+                        break;
+                }
+            }
+
             using NpgsqlConnection conn = new (connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
@@ -104,7 +126,8 @@ namespace svod_admin.Pages.Target
                 int res = cmd.ExecuteNonQuery();
                 conn.Close();
             }
-            return new RedirectToPageResult("/Target/TargetFinegrained", new { login });
+            string message = $"success {FormID}";
+            return new RedirectToPageResult("/Target/TargetFinegrained", new { login, message });
         }
     }
 }
