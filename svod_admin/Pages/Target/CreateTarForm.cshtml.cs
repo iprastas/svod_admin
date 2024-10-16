@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NpgsqlTypes;
+using Npgsql;
 
 namespace svod_admin.Pages.Target
 {
@@ -32,24 +33,22 @@ namespace svod_admin.Pages.Target
 
         public void OnGet()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(ConnectionString))
+            using NpgsqlConnection conn = new(ConnectionString);
+            conn.Open();
+            NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = $"select form,substring(coalesce(name, short) from 0 for 150) from svod2.form where form>0 and "
+            + " coalesce(upto,current_date)>=current_date and form not in(select form from svod2.targetfinegrained  "
+            + $" where targetuser='{RouteData.Values["login"]}') order by form;";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = $"select form,substring(coalesce(name, short) from 0 for 150) from svod2.form where form>0 and "
-                + " coalesce(upto,current_date)>=current_date and form not in(select form from svod2.targetfinegrained  "
-                + $" where targetuser='{RouteData.Values["login"]}') order by form;";
-                Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    SelectListItem item = new SelectListItem();
-                    item.Value = reader.GetInt32(0).ToString();
-                    if(!reader.IsDBNull(1)) item.Text = "¹" + item.Value + " - " + reader.GetString(1);
-                    Items.Add(item);
-                }
-                cmd.Dispose();
-                conn.Close();
+                SelectListItem item = new();
+                item.Value = reader.GetInt32(0).ToString();
+                if (!reader.IsDBNull(1)) item.Text = "¹" + item.Value + " - " + reader.GetString(1);
+                Items.Add(item);
             }
+            cmd.Dispose();
+            conn.Close();
         }
         public IActionResult OnPostCancel()
         {
@@ -58,10 +57,10 @@ namespace svod_admin.Pages.Target
 
         public IActionResult OnPostCreate()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(ConnectionString))
+            using (NpgsqlConnection conn = new (ConnectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "insert into svod2.targetfinegrained(form,targetuser,permission) values(:f,:u,:p)";
                 cmd.Parameters.Add(":f",NpgsqlDbType.Integer);
                 cmd.Parameters.Add(":u",NpgsqlDbType.Varchar).Value = Login;

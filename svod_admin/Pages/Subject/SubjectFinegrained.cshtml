@@ -1,4 +1,4 @@
-﻿@page "{login}, {subjectid}"
+﻿@page "{login}, {subjectid}.{message?}"
 @model svod_admin.Pages.Subject.SubjectFinegrainedModel
 @{
     ViewData["Title"] = "Формы муниципалов";
@@ -65,3 +65,58 @@
         </form>
     </div>
 </div>
+
+@if (!string.IsNullOrEmpty(@Model.Message))
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        @if (Model.Success)
+        {
+            <div class="toast text-white bg-success border-0"
+                 id="bottomToast"
+                 role="alert"
+                 aria-live="assertive"
+                 aria-atomic="true">
+
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @Model.Message
+                    </div>
+                    <button type="button"
+                            class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="toast text-white bg-danger border-0"
+                 id="bottomToast"
+                 role="alert"
+                 aria-live="assertive"
+                 aria-atomic="true">
+
+                <div class="d-flex">
+                    <div class="toast-body">
+                        @Model.Message
+                    </div>
+                    <button type="button"
+                            class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        }
+    </div>
+}
+</>
+@section Scripts
+{
+    <script>
+        var toastElList = [].slice.call(document.querySelectorAll('#bottomToast'));
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl);
+        });
+        toastList.forEach(toast => toast.show());
+    </script>
+}

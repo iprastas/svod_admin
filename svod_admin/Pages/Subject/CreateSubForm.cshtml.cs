@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NpgsqlTypes;
+using Npgsql;
 using static svod_admin.Pages.Target.CreateTarFormModel;
 
 namespace svod_admin.Pages.Subject
@@ -17,7 +18,7 @@ namespace svod_admin.Pages.Subject
 
         string? ConnectionString { get; } = string.Empty;
 
-        public ICollection<SelectListItem> Items = new List<SelectListItem>();
+        public ICollection<SelectListItem> Items = [];
         readonly IConfiguration? configuration;
 
         public CreateSubFormModel(IConfiguration? _configuration)
@@ -29,29 +30,27 @@ namespace svod_admin.Pages.Subject
 
         public class FormsPermission
         {
-            public IEnumerable<string> forms { get; set; } = new List<string>();
+            public IEnumerable<string> forms { get; set; } = [];
         }
 
         public void OnGet()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(ConnectionString))
+            using NpgsqlConnection conn = new (ConnectionString);
+            conn.Open();
+            NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = $"select form,substring(coalesce(name, short) from 0 for 150) from svod2.form where form>0 and "
+            + " coalesce(upto,current_date)>=current_date and form not in(select form from svod2.subjectfinegrained  "
+            + $" where subjectuser='{RouteData.Values["login"]}' and subject='{RouteData.Values["subjectid"]}') order by form;";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = $"select form,substring(coalesce(name, short) from 0 for 150) from svod2.form where form>0 and "
-                + " coalesce(upto,current_date)>=current_date and form not in(select form from svod2.subjectfinegrained  "
-                + $" where subjectuser='{RouteData.Values["login"]}' and subject='{RouteData.Values["subjectid"]}') order by form;";
-                Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    SelectListItem item = new SelectListItem();
-                    item.Value = reader.GetInt32(0).ToString();
-                    if (!reader.IsDBNull(1)) item.Text = reader.GetString(1);
-                    Items.Add(item);
-                }
-                cmd.Dispose();
-                conn.Close();
+                SelectListItem item = new();
+                item.Value = reader.GetInt32(0).ToString();
+                if (!reader.IsDBNull(1)) item.Text = reader.GetString(1);
+                Items.Add(item);
             }
+            cmd.Dispose();
+            conn.Close();
         }
         public IActionResult OnPostCancel()
         {
@@ -60,10 +59,10 @@ namespace svod_admin.Pages.Subject
 
         public IActionResult OnPostCreate()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(ConnectionString))
+            using (NpgsqlConnection conn = new(ConnectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "insert into svod2.subjectfinegrained(form,subject,subjectuser,permission) values(:f,:s,:u,:p)";
                 cmd.Parameters.Add(":f", NpgsqlDbType.Integer);
                 cmd.Parameters.Add(":s", NpgsqlDbType.Integer).Value = Convert.ToInt32(RouteData.Values["subjectid"] as string);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NpgsqlTypes;
+using Npgsql;
 
 namespace svod_admin.Pages.Territory
 {
@@ -39,43 +40,41 @@ namespace svod_admin.Pages.Territory
         }
         public void OnGet()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "select tf.form,coalesce(f.name,f.short),t.name,tf.territoryusers,tf.permission,tf.username,tf.changedate, t.territory "
+                + "from svod2.territoryfinegrained tf"
+                + " left outer join svod2.form f on tf.form = f.form "
+                + " left outer join svod2.territory t on tf.territory = t.territory "
+                + $"where tf.territoryusers='{RouteData.Values["login"]}' order by f.name ";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            int i = 1;
+            while (reader.Read())
             {
-                conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "select tf.form,coalesce(f.name,f.short),t.name,tf.territoryusers,tf.permission,tf.username,tf.changedate, t.territory "
-                    + "from svod2.territoryfinegrained tf"
-                    + " left outer join svod2.form f on tf.form = f.form "
-                    + " left outer join svod2.territory t on tf.territory = t.territory "
-                    + $"where tf.territoryusers='{RouteData.Values["login"]}' order by f.name ";
-                Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-                int i = 1;
-                while (reader.Read())
-                {
-                    TerritoryFinegrainedModel user = new(null);
-                    if (!reader.IsDBNull(0))
-                        user.FormID = reader.GetInt32(0);
-                    if (!reader.IsDBNull(1))
-                        user.FormName = reader.GetString(1);
-                    if (!reader.IsDBNull(2))
-                        user.Territory = reader.GetString(2);
-                    if (!reader.IsDBNull(3))
-                        user.Login = reader.GetString(3);
-                    if (!reader.IsDBNull(4))
-                        user.Permission = reader.GetInt32(4);
-                    if (!reader.IsDBNull(5))
-                        user.Username = reader.GetString(5);
-                    if (!reader.IsDBNull(6))
-                        user.ChangeDate = reader.GetDateTime(6);
-                    if (!reader.IsDBNull(7))
-                        user.TerritoryID = reader.GetInt32(7);
+                TerritoryFinegrainedModel user = new(null);
+                if (!reader.IsDBNull(0))
+                    user.FormID = reader.GetInt32(0);
+                if (!reader.IsDBNull(1))
+                    user.FormName = reader.GetString(1);
+                if (!reader.IsDBNull(2))
+                    user.Territory = reader.GetString(2);
+                if (!reader.IsDBNull(3))
+                    user.Login = reader.GetString(3);
+                if (!reader.IsDBNull(4))
+                    user.Permission = reader.GetInt32(4);
+                if (!reader.IsDBNull(5))
+                    user.Username = reader.GetString(5);
+                if (!reader.IsDBNull(6))
+                    user.ChangeDate = reader.GetDateTime(6);
+                if (!reader.IsDBNull(7))
+                    user.TerritoryID = reader.GetInt32(7);
 
-                    user.Num = i;
-                    i += 1; 
-                    list.Add(user);
-                }
-                conn.Close();
+                user.Num = i;
+                i += 1;
+                list.Add(user);
             }
+            conn.Close();
         }
 
         public IActionResult OnPostCreate(string login, int territoryid)
@@ -85,10 +84,10 @@ namespace svod_admin.Pages.Territory
 
         public IActionResult OnPostDelete(string login, int territoryid, int formid)
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            using (NpgsqlConnection conn = new (connectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "delete from svod2.territoryfinegrained where form=:formid and territoryusers=:login and territory=:territoryid";
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
                 cmd.Parameters.Add(":territoryid", NpgsqlDbType.Integer).Value = territoryid;
@@ -102,10 +101,10 @@ namespace svod_admin.Pages.Territory
         public IActionResult OnPostEdit(string login, int formid, int territoryid, int number)
         {
             var permission = Request.Form["Permission"];
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            using (NpgsqlConnection conn = new (connectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.territoryfinegrained set permission=:perm where form=:formid and territoryusers=:login and territory=:territoryid";
                 cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[number - 1]);
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;

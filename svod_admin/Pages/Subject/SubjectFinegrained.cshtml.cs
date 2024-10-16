@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NpgsqlTypes;
+using Npgsql;
+
 
 namespace svod_admin.Pages.Subject
 {
@@ -27,6 +29,8 @@ namespace svod_admin.Pages.Subject
         [BindProperty] public int Permission { get; set; }
         [BindProperty] public string Username { get; set; } = "";
         [BindProperty] public DateTime? ChangeDate { get; set; }
+        [BindProperty] public string? Message { get; set; } = "";
+        [BindProperty] public bool Success { get; set; }
 
         string? connectionString;
         public List<SubjectFinegrainedModel> list = new();
@@ -39,43 +43,61 @@ namespace svod_admin.Pages.Subject
         }
         public void OnGet()
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            Message = Convert.ToString(RouteData.Values["Message"]);
+            if (Message != "")
             {
-                conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "select sf.form,coalesce(f.name,f.short),s.short,sf.subjectuser,sf.permission,sf.username,sf.changedate,sf.subject "
-                    + "from svod2.subjectfinegrained sf"
-                    + " left outer join svod2.form f on sf.form = f.form "
-                    + " left outer join svod2.subject s on sf.subject = s.subject "
-                    + $"where sf.subjectuser='{RouteData.Values["login"]}' order by f.name ";
-                Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-                int i = 1;
-                while (reader.Read())
-                {
-                    SubjectFinegrainedModel user = new(null);
-                    if (!reader.IsDBNull(0)) 
-                        user.FormID = reader.GetInt32(0);
-                    if (!reader.IsDBNull(1))
-                        user.FormName = reader.GetString(1);
-                    if (!reader.IsDBNull(2))
-                        user.Subject = reader.GetString(2);
-                    if (!reader.IsDBNull(3))
-                        user.Login = reader.GetString(3);
-                    if (!reader.IsDBNull(4))
-                        user.Permission = reader.GetInt32(4);
-                    if (!reader.IsDBNull(5))
-                        user.Username = reader.GetString(5);
-                    if (!reader.IsDBNull(6))
-                        user.ChangeDate = reader.GetDateTime(6);
-                    if (!reader.IsDBNull(7))
-                        user.SubjectID = reader.GetInt32(7);
+                var parts = Message.Split(' ');
+                Message = parts[0];
+                FormID = Convert.ToInt32(parts[1]);
 
-                    user.Num = i;
-                    i += 1;
-                    list.Add(user);
+                switch (Message)
+                {
+                    case "success":
+                        Message = $"Успешно! Форма {FormID} изменена.";
+                        Success = true;
+                        break;
+                    case "error":
+                        Message = $"Ошибка! Форма {FormID} не была изменена.";
+                        Success = false;
+                        break;
                 }
-                conn.Close();
             }
+
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "select sf.form,coalesce(f.name,f.short),s.short,sf.subjectuser,sf.permission,sf.username,sf.changedate,sf.subject "
+                + "from svod2.subjectfinegrained sf"
+                + " left outer join svod2.form f on sf.form = f.form "
+                + " left outer join svod2.subject s on sf.subject = s.subject "
+                + $"where sf.subjectuser='{RouteData.Values["login"]}' order by f.name ";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            int i = 1;
+            while (reader.Read())
+            {
+                SubjectFinegrainedModel user = new(null);
+                if (!reader.IsDBNull(0))
+                    user.FormID = reader.GetInt32(0);
+                if (!reader.IsDBNull(1))
+                    user.FormName = reader.GetString(1);
+                if (!reader.IsDBNull(2))
+                    user.Subject = reader.GetString(2);
+                if (!reader.IsDBNull(3))
+                    user.Login = reader.GetString(3);
+                if (!reader.IsDBNull(4))
+                    user.Permission = reader.GetInt32(4);
+                if (!reader.IsDBNull(5))
+                    user.Username = reader.GetString(5);
+                if (!reader.IsDBNull(6))
+                    user.ChangeDate = reader.GetDateTime(6);
+                if (!reader.IsDBNull(7))
+                    user.SubjectID = reader.GetInt32(7);
+
+                user.Num = i;
+                i += 1;
+                list.Add(user);
+            }
+            conn.Close();
         }
 
         public IActionResult OnPostCreate(string login, int subjectid)
@@ -85,10 +107,10 @@ namespace svod_admin.Pages.Subject
 
         public IActionResult OnPostDelete(string login, int formid, int subjectid)
         {
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            using (NpgsqlConnection conn = new (connectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "delete from svod2.subjectfinegrained where form=:formid and subjectuser=:login and subject=:subjectid";
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
                 cmd.Parameters.Add(":subjectid", NpgsqlDbType.Integer).Value = subjectid;
@@ -102,10 +124,10 @@ namespace svod_admin.Pages.Subject
         public IActionResult OnPostEdit(string login, int formid, int subjectid, int number)
         {
             var permission = Request.Form["Permission"];
-            using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(connectionString))
+            using (NpgsqlConnection conn = new (connectionString))
             {
                 conn.Open();
-                Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
+                NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.subjectfinegrained set permission=:perm where form=:formid and subjectuser=:login and subject=:subjectid";
                 cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[number - 1]);
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
@@ -114,7 +136,8 @@ namespace svod_admin.Pages.Subject
                 int res = cmd.ExecuteNonQuery();
                 conn.Close();
             }
-            return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid });
+            string message = $"success {FormID}";
+            return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid, message });
         }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using svod_admin;
 using Npgsql;
 using NpgsqlTypes;
 using System.Xml.Linq;
@@ -38,6 +39,11 @@ namespace svod_admin.Pages
         {
             //object? login = RouteData.Values["login"];
             //Id = Convert.ToInt32((string)RouteData.Values["id"]);
+        }
+
+        public IActionResult OnPostCancel()
+        {
+            return Redirect("/Territory/TerritoryUsers");
         }
 
         public IActionResult OnPostEdit()
