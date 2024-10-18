@@ -8,7 +8,6 @@ namespace svod_admin
         IConfiguration config;
         public static string? connStr;
         public static readonly Dictionary<int, string> forms =new();
-        public static readonly Dictionary<int, bool> formsbool = new();
 
         public static readonly Random random = new Random();
         public const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -49,10 +48,8 @@ namespace svod_admin
             {
                 int i = reader.GetInt32(0);
                 string s = reader.GetString(1);
-                bool fl = false;
 
                 forms.Add(i, s);
-                formsbool.Add(i, fl);
             }
             conn.Close();
         }
