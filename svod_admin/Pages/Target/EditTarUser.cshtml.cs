@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using NpgsqlTypes;
+using System.Reflection;
 
 namespace svod_admin.Pages.Target
 {
@@ -26,6 +27,10 @@ namespace svod_admin.Pages.Target
         [BindProperty] public string? Username { get; set; } = "";
         [BindProperty] public string? connectionString { get; }
 
+        public Dictionary<ulong, string> Icanflags = Pg.icanflags;
+        public Dictionary<ulong, bool> Icanflagsbool = new();
+        public Dictionary<int, string> forms = Pg.forms;
+        public Dictionary<int, bool> formsbool = new();
 
         readonly IConfiguration configuration;
         public EditTarUserModel(IConfiguration _configuration)
@@ -38,9 +43,65 @@ namespace svod_admin.Pages.Target
 
         public void OnGet()
         {
+            foreach (var f in forms)
+            {
+                formsbool.Add(f.Key, false);
+            }
+            int[] myFormsKinds;
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            NpgsqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT u.login,u.password,u.passwordupto,t.name,u.department,u.name,u.note, u.myformkinds, "
+            + "u.myforms,u.icanflags,u.changer,u.username,u.changedate FROM svod2.targetusers u left outer join svod2.territory t "
+            + $"on u.territory = t.territory WHERE login='{RouteData.Values["login"]}'";
+            NpgsqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Login = reader.GetString(0);
+                if (!reader.IsDBNull(1))
+                    Password = reader.GetString(1);
+                if (!reader.IsDBNull(2))
+                    Passwordupto = reader.GetDateTime(2);
+                if (!reader.IsDBNull(3))
+                    Territory = reader.GetString(3);
+                if (!reader.IsDBNull(4))
+                    Department = reader.GetString(4);
+                if (!reader.IsDBNull(5))
+                    Name = reader.GetString(5);
+                if (!reader.IsDBNull(6))
+                    Note = reader.GetString(6);
+                if (!reader.IsDBNull(7))
+                    Myformkinds = reader.GetString(7);
+                if (!reader.IsDBNull(8))
+                    Myforms = reader.GetString(8);
+                if (!reader.IsDBNull(9))
+                    icanFlags = (ulong)reader.GetInt64(9);
+                if (!reader.IsDBNull(10))
+                    Changer = reader.GetString(10);
+                if (!reader.IsDBNull(11))
+                    Username = reader.GetString(11);
+
+                if (!string.IsNullOrEmpty(Myformkinds))
+                {
+                    myFormsKinds = Myformkinds.Split(',').Select(snum => int.Parse(snum)).ToArray();
+                    foreach (var i in myFormsKinds)
+                    {
+                        if (i < 5 && i > 0)
+                        {
+                            formsbool[i] = true;
+                        }
+                    }
+                }
+            }
+            conn.Close();
+
+            foreach (var flag in Icanflags)
+            {
+                Icanflagsbool.Add(flag.Key, (icanFlags & flag.Key) != 0);
+            }
         }
 
-        public IActionResult OnPostCancel()
+            public IActionResult OnPostCancel()
         {
             return Redirect("/Target/TargetUser");
         }

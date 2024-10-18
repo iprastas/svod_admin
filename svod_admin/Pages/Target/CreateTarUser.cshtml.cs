@@ -20,6 +20,11 @@ namespace svod_admin.Pages.Target
         [BindProperty] public List<ulong> Cflags { get; set; }
         [BindProperty] public string? Changer { get; set; } = "";
         [BindProperty] public string? Username { get; set; } = "";
+
+        public Dictionary<ulong, string> Icanflags = Pg.icanflags;
+        public Dictionary<ulong, bool> Icanflagsbool = new();
+        public Dictionary<int, string> forms = Pg.forms;
+        public Dictionary<int, bool> formsbool = new();
         [BindProperty] public string? ConnectionString {get;}
         private readonly IConfiguration Configuration;
         public CreateTarUserModel(IConfiguration configuration)
@@ -28,6 +33,19 @@ namespace svod_admin.Pages.Target
             Cflags = new List<ulong>();
             Configuration = configuration;
             ConnectionString = Configuration.GetConnectionString("DefaultConnection");
+        }
+
+        public void OnGet()
+        {
+            foreach (var f in forms)
+            {
+                formsbool.Add(f.Key, false);
+            }
+
+            foreach (var flag in Icanflags)
+            {
+                Icanflagsbool.Add(flag.Key, false);
+            }
         }
 
         public IActionResult OnPostCancel()

@@ -7,14 +7,33 @@ namespace svod_admin
     {
         IConfiguration config;
         public static string? connStr;
-        public static readonly Dictionary<int, string> forms = [];
-        public static Dictionary<int, bool> formsbool = [];
+        public static readonly Dictionary<int, string> forms =new();
+        public static readonly Dictionary<int, bool> formsbool = new();
 
         public static readonly Random random = new Random();
         public const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string LowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
         public const string Numbers = "0123456789";
         public const string SpecialCharacters = "!@#$%^&*()_-+=<>?";
+
+        public static Dictionary<ulong, string> icanflags = new ()
+        {
+            { 0x00000001U, "я могу изменить введённые данные моего субъекта"},
+            { 0x00000002U, "я могу изменить данные моих подчинённых субъектов"},
+            { 0x00000004U, "я могу изменить данные субъектов моей территории"},
+            { 0x00000008U, "я могу изменить данные любых субъектов"},
+            { 0x00000010U, "я могу смотреть вводные формы данных"},
+            { 0x00000020U, "я могу смотреть аналитические формы данных"},
+            { 0x00000040U, "я могу смотреть первичные данные"},
+            { 0x00000100U, "я могу редактировать реестр территорий"},
+            { 0x00000200U, "я могу редактировать реестр субъектов"},
+            { 0x00000400U, "я могу редактировать реестр объектов"},
+            { 0x10000000U, "я могу копировать данные"},
+            { 0x20000000U, "я могу редактировать пользователей и их права"},
+            { 0x40000000U, "я могу редактировать параметры"},
+            { 0x80000000U, "я могу смотреть устаревшие формы"},
+            { 0x00001000U, "я могу редактировать исторические данные"}
+        };
 
         public Pg(IConfiguration configuration)
         {

@@ -3,85 +3,7 @@
 @model svod_admin.Pages.Target.EditTarUserModel
 @{
     ViewData["Title"] = "Изменение пользователя МЖКХ";
-
-    Dictionary<int, string> forms = Pg.forms;
-    Dictionary<int, bool> formsbool = Pg.formsbool;
-
-    int[] myFormsKinds;
-    using (Npgsql.NpgsqlConnection conn = new Npgsql.NpgsqlConnection(Model.connectionString))
-    {
-        conn.Open();
-        Npgsql.NpgsqlCommand cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT u.login,u.password,u.passwordupto,t.name,u.department,u.name,u.note, u.myformkinds, "
-        + "u.myforms,u.icanflags,u.changer,u.username,u.changedate FROM svod2.targetusers u left outer join svod2.territory t "
-        + $"on u.territory = t.territory WHERE login='{RouteData.Values["login"]}'";
-        Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
-        while (reader.Read())
-        {
-            Model.Login = reader.GetString(0);
-            if (!reader.IsDBNull(1))
-                Model.Password = reader.GetString(1);
-            if (!reader.IsDBNull(2))
-                Model.Passwordupto = reader.GetDateTime(2);
-            if (!reader.IsDBNull(3))
-                Model.Territory = reader.GetString(3);
-            if (!reader.IsDBNull(4))
-                Model.Department = reader.GetString(4);
-            if (!reader.IsDBNull(5))
-                Model.Name = reader.GetString(5);
-            if (!reader.IsDBNull(6))
-                Model.Note = reader.GetString(6);
-            if (!reader.IsDBNull(7))
-                Model.Myformkinds = reader.GetString(7);
-            if (!reader.IsDBNull(8))
-                Model.Myforms = reader.GetString(8);
-            if (!reader.IsDBNull(9))
-                Model.icanFlags = (ulong)reader.GetInt64(9);
-            if (!reader.IsDBNull(10))
-                Model.Changer = reader.GetString(10);
-            if (!reader.IsDBNull(11))
-                Model.Username = reader.GetString(11);
-
-            if (!string.IsNullOrEmpty(Model.Myformkinds))
-            {
-                myFormsKinds = Model.Myformkinds.Split(',').Select(snum => int.Parse(snum)).ToArray();
-                foreach (var i in myFormsKinds)
-                {
-                    if(i < 5 && i > 0)
-                    {
-                        formsbool[i] = true;
-                    }
-                }
-            }
-        }
-        conn.Close();
-    }
-
-    var icanflags = new Dictionary<ulong, string>()
-    {
-        { 0x00000001U, "я могу изменить введённые данные моего субъекта"},
-        { 0x00000002U, "я могу изменить данные моих подчинённых субъектов"},
-        { 0x00000004U, "я могу изменить данные субъектов моей территории"},
-        { 0x00000008U, "я могу изменить данные любых субъектов"},
-        { 0x00000010U, "я могу смотреть вводные формы данных"},
-        { 0x00000020U, "я могу смотреть аналитические формы данных"},
-        { 0x00000040U, "я могу смотреть первичные данные"},
-        { 0x00000100U, "я могу редактировать реестр территорий"},
-        { 0x00000200U, "я могу редактировать реестр субъектов"},
-        { 0x00000400U, "я могу редактировать реестр объектов"},
-        { 0x10000000U, "я могу копировать данные"},
-        { 0x20000000U, "я могу редактировать пользователей и их права"},
-        { 0x40000000U, "я могу редактировать параметры"},
-        { 0x80000000U, "я могу смотреть устаревшие формы"}
-    };
-
-    var icanflagsbool = new Dictionary<ulong, bool>();
-    foreach (var flag in icanflags)
-    {
-        icanflagsbool.Add(flag.Key, (Model.icanFlags & flag.Key) != 0);
-    }
 }
-
 
 <div class="container-fluid">
     <form method="post" class="row g-3 editform">
@@ -119,24 +41,24 @@
         <div class="row permissions">
             <div class="col">
                 <label for="inputFlags" class="form-label">Виды форм</label>
-                @foreach (var flag in formsbool)
+                @foreach (var flag in Model.formsbool)
                 {
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="Fkinds" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
                         <label class="form-check-label" for="flexCheckDefault">
-                            @flag.Key - @forms[flag.Key]
+                            @flag.Key - @Model.forms[flag.Key]
                         </label>
                     </div>
                 }
             </div>
             <div class="col">
                 <label for="inputFlags" class="form-label">Разрешения</label>
-                @foreach (var flag in icanflagsbool)
+                @foreach (var flag in Model.Icanflagsbool)
                 {
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="Cflags" value="@flag.Key" asp-for="@flag.Value" id="flexCheckDefault">
                         <label class="form-check-label" for="flexCheckDefault">
-                            @icanflags[flag.Key]
+                            @Model.Icanflags[flag.Key]
                         </label>
                     </div>
                 }
