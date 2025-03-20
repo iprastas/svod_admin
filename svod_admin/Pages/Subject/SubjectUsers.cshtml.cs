@@ -19,10 +19,11 @@ namespace svod_admin.Pages.Subject
             using NpgsqlConnection conn = new (connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select u.subject,u.login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,u.changer,u.username,u.changedate"
-            + " from svod2.subject s"
-            + " left outer join svod2.subjectusers u on u.subject = s.subject and coalesce(s.upto,current_date)>=current_date"
-            + " left outer join svod2.territory ty on s.territorywork = ty.territory order by ty.name";
+            cmd.CommandText = "select u.subject,u.login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,u.changer,u.username,u.changedate "
+            + "from svod2.subject s,svod2.subjectusers u, svod2.territory ty " +
+            "where u.subject = s.subject and coalesce(s.upto,current_date)>=current_date " +
+            "and s.territorywork = ty.territory " +
+            "order by  ty.name;";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
