@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NpgsqlTypes;
 using Npgsql;
-using static svod_admin.Pages.Target.CreateTarFormModel;
 
 namespace svod_admin.Pages.Subject
 {
@@ -30,7 +29,7 @@ namespace svod_admin.Pages.Subject
 
         public class FormsPermission
         {
-            public IEnumerable<string> forms { get; set; } = [];
+            public IEnumerable<string> forms { get; set; } = new List<string>();
         }
 
         public void OnGet()
@@ -63,11 +62,12 @@ namespace svod_admin.Pages.Subject
             {
                 conn.Open();
                 NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "insert into svod2.subjectfinegrained(form,subject,subjectuser,permission) values(:f,:s,:u,:p)";
+                cmd.CommandText = "insert into svod2.subjectfinegrained(form,subject,subjectuser,permission,changedate) values(:f,:s,:u,:p,:cd)";
                 cmd.Parameters.Add(":f", NpgsqlDbType.Integer);
                 cmd.Parameters.Add(":s", NpgsqlDbType.Integer).Value = Convert.ToInt32(RouteData.Values["subjectid"] as string);
                 cmd.Parameters.Add(":u", NpgsqlDbType.Varchar).Value = Login;
                 cmd.Parameters.Add(":p", NpgsqlDbType.Integer).Value = Permission;
+                cmd.Parameters.Add(":cd", NpgsqlDbType.Date).Value = DateTime.Now;
                 foreach (var item in Forms.forms)
                 {
                     cmd.Parameters[":f"].Value = int.Parse(item);

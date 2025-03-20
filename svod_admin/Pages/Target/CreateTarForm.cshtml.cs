@@ -61,10 +61,11 @@ namespace svod_admin.Pages.Target
             {
                 conn.Open();
                 NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "insert into svod2.targetfinegrained(form,targetuser,permission) values(:f,:u,:p)";
+                cmd.CommandText = "insert into svod2.targetfinegrained(form,targetuser,permission,changedate) values(:f,:u,:p,:cd)";
                 cmd.Parameters.Add(":f",NpgsqlDbType.Integer);
                 cmd.Parameters.Add(":u",NpgsqlDbType.Varchar).Value = Login;
                 cmd.Parameters.Add(":p",NpgsqlDbType.Integer).Value = Permission;
+                cmd.Parameters.Add(":cd",NpgsqlDbType.Date).Value = DateTime.Now;
                 foreach (var item in Forms.forms)
                 {
                     cmd.Parameters[":f"].Value = int.Parse(item);

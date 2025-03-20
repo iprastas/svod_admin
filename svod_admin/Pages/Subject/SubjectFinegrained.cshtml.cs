@@ -137,7 +137,8 @@ namespace svod_admin.Pages.Subject
                 conn.Close();
             }
             string message = $"success {FormID}";
-            return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid, message });
+            return new JsonResult(new { success = true, message }); ;
+            //return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid, message });
         }
     }
 }

@@ -31,4 +31,29 @@ jQuery(function () {
 
         });
     });
+
+    $('#SaveFinegrainded').on('click', function () {
+        var Login = DataView[""];
+
+        $.ajax({
+            async: true,
+            type: 'GET',
+            url: '/regulations/index?periodic=' + periodic,
+            success: function (data) {
+                $('#Regulations').empty();
+                // Заполняем список регламентов новыми данными
+                $.each(data, function (index, item) {
+                    $('#Regulations').append($('<option>').val(item.value).text(item.text));
+                });
+            },
+            error: function (XMLHttpRequest) {
+                $.notify("Ошибка /Form/Check. Статус - " + XMLHttpRequest.status + " Техт: " + XMLHttpRequest.responseText, {
+                    clickToHide: false,
+                    autoHideDelay: 10000
+                });
+            }
+        }).then(function (data) {
+
+        });
+    });
 });

@@ -42,12 +42,12 @@
                             <td>@us.Subject</td>
                             <td>@us.Login</td>
                             <td>
-                                <select class="form-select" asp-for="@us.Permission" name="Permission" asp-items="Model.ListOfPermiss"></select>
+                                <select class="form-select" asp-for="@us.Permission" name="Permission" id="Permission" asp-items="Model.ListOfPermiss"></select>
                             </td>
                             <td>@us.Username</td>
                             <td>@us.ChangeDate</td>
                             <td>
-                                <button type="submit" asp-page-handler="edit" asp-route-formid="@us.FormID" asp-route-login="@us.Login" asp-route-subjectid="@us.SubjectID" asp-route-number="@us.Num" class="btn btn-outline-success actions" title="Сохранить">
+                                <button type="submit" id="SaveFinegrainded" asp-page-handler="edit" asp-route-formid="@us.FormID" asp-route-login="@us.Login" asp-route-subjectid="@us.SubjectID" asp-route-number="@us.Num" class="btn btn-outline-success actions" title="Сохранить">
                                     <span>
                                         <img src="~/save.svg">
                                     </span>
@@ -66,57 +66,33 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(@Model.Message))
-{
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        @if (Model.Success)
-        {
-            <div class="toast text-white bg-success border-0"
-                 id="bottomToast"
-                 role="alert"
-                 aria-live="assertive"
-                 aria-atomic="true">
+<div class="toast text-white bg-success border-0"
+     id="bottomToast"
+     role="alert"
+     aria-live="assertive"
+     aria-atomic="true">
 
-                <div class="d-flex">
-                    <div class="toast-body">
-                        @Model.Message
-                    </div>
-                    <button type="button"
-                            class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="toast text-white bg-danger border-0"
-                 id="bottomToast"
-                 role="alert"
-                 aria-live="assertive"
-                 aria-atomic="true">
-
-                <div class="d-flex">
-                    <div class="toast-body">
-                        @Model.Message
-                    </div>
-                    <button type="button"
-                            class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-        }
+    <div class="d-flex">
+        <div class="toast-body">
+            @Model.Message
+        </div>
+        <button type="button"
+                class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"
+                aria-label="Close"></button>
     </div>
-}
-</>
+</div>
+
 @section Scripts
 {
     <script>
-        var toastElList = [].slice.call(document.querySelectorAll('#bottomToast'));
-        var toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl);
-        });
-        toastList.forEach(toast => toast.show());
+        
+        // if (document.querySelector('#bottomToast')) {
+        //     var toastElList = [].slice.call(document.querySelectorAll('#bottomToast'));
+        //     var toastList = toastElList.map(function (toastEl) {
+        //         return new bootstrap.Toast(toastEl);
+        //     });
+        //     toastList.forEach(toast => toast.show());
+        // }
     </script>
 }

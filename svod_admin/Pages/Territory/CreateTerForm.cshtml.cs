@@ -62,11 +62,12 @@ namespace svod_admin.Pages.Territory
             {
                 conn.Open();
                 NpgsqlCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "insert into svod2.territoryfinegrained(form,territory,territoryusers,permission) values(:f,:t,:u,:p)";
+                cmd.CommandText = "insert into svod2.territoryfinegrained(form,territory,territoryusers,permission,changedate) values(:f,:t,:u,:p,:cd)";
                 cmd.Parameters.Add(":f", NpgsqlDbType.Integer);
                 cmd.Parameters.Add(":t", NpgsqlDbType.Integer).Value = Convert.ToInt32(RouteData.Values["territoryid"] as string);
                 cmd.Parameters.Add(":u", NpgsqlDbType.Varchar).Value = Login;
                 cmd.Parameters.Add(":p", NpgsqlDbType.Integer).Value = Permission;
+                cmd.Parameters.Add(":cd", NpgsqlDbType.Date).Value = DateTime.Now;
                 foreach (var item in Forms.forms)
                 {
                     cmd.Parameters[":f"].Value = int.Parse(item);
