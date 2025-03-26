@@ -20,9 +20,9 @@ namespace svod_admin.Pages.Territory
             using NpgsqlConnection conn = new(connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select t.territory,k.short||t.name,tu.* from territory t "
-            + " left outer join territoryusers tu on t.territory=tu.territory"
-            + " left outer join territorykind k on t.territorykind=k.territorykind"
+            cmd.CommandText = "select t.territory,k.short||t.name,tu.* from svod2.territory t "
+            + " left outer join svod2.territoryusers tu on t.territory=tu.territory"
+            + " left outer join svod2.territorykind k on t.territorykind=k.territorykind"
             + " where t.territory > 3 and k.territorykind in(10,12,15,16,17,28,29,35,37,38) order by 1;";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())

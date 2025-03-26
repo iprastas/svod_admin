@@ -52,9 +52,9 @@ namespace svod_admin.Pages
             using NpgsqlConnection conn = new(ConnectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select t.territory,k.short||t.name,tu.* from territory t "
-            + " left outer join territoryusers tu on t.territory=tu.territory"
-            + " left outer join territorykind k on t.territorykind=k.territorykind"
+            cmd.CommandText = "select t.territory,k.short||t.name,tu.* from svod2.territory t "
+            + " left outer join svod2.territoryusers tu on t.territory=tu.territory"
+            + " left outer join svod2.territorykind k on t.territorykind=k.territorykind"
             + $" where tu.territory='{RouteData.Values["id"]}' and tu.login='{RouteData.Values["login"]}'";
             Npgsql.NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
