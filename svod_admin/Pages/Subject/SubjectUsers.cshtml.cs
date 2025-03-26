@@ -19,7 +19,7 @@ namespace svod_admin.Pages.Subject
             using NpgsqlConnection conn = new (connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select s.subject,u.login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,s.changer,s.username,s.changedate "
+            cmd.CommandText = "select s.subject,s.inn login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,s.changer,s.username,s.changedate "
             + " from svod2.subject s " +
             " left outer join svod2.subjectusers u on u.subject = s.subject and coalesce(s.upto,current_date)>=current_date " +
             " left outer join svod2.territory ty on s.territorywork = ty.territory " +
@@ -68,11 +68,6 @@ namespace svod_admin.Pages.Subject
         public IActionResult OnPostForm(string login, int subjectid)
         {
             return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid });
-        }
-
-        public IActionResult OnPostCreate()
-        {
-            return Redirect("/Subject/CreateSubUser");
         }
     }
 }

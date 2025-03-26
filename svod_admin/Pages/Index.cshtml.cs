@@ -32,7 +32,11 @@ namespace svod_admin.Pages
         }
         public IActionResult OnGetExit()
 		{
-			HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            string? connectionString = configuration.GetConnectionString("DefaultConnection");
+            using NpgsqlConnection con = new (connectionString);
+            NpgsqlConnection.ClearPool(con);
+            
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 			return Redirect("/Index");
 		}
 

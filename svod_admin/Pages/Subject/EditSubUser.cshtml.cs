@@ -7,6 +7,7 @@ using System.Text;
 using System;
 using System.Xml.Linq;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace svod_admin.Pages.Subject
 {
@@ -56,13 +57,13 @@ namespace svod_admin.Pages.Subject
             using NpgsqlConnection conn = new(connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "select u.subject,u.login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,u.changer,u.username"
-            + " from svod2.subject s"
-            + " left outer join svod2.subjectusers u on u.subject = s.subject"
-            + " left outer join svod2.territory ty on s.territorywork = ty.territory"
-            + " where u.subject=:sid and u.login=:l";
-            cmd.Parameters.Add(":sid", NpgsqlDbType.Integer).Value = Convert.ToInt32(RouteData.Values["id"]);
-            cmd.Parameters.Add(":l", NpgsqlDbType.Varchar).Value = RouteData.Values["login"];
+            cmd.CommandText = "select s.subject,s.inn login,u.password,u.passwordupto,ty.name,s.short,u.note,u.myformkinds,u.myforms,u.icanflags,s.changer,s.username,s.changedate "
+            + " from svod2.subject s "
+            + " left outer join svod2.subjectusers u on u.subject = s.subject and coalesce(s.upto,current_date)>=current_date"
+            + " left outer join svod2.territory ty on s.territorywork = ty.territory "
+            + " where s.subject=:sid and s.inn=:l";
+            cmd.Parameters.Add(":sid", NpgsqlDbType.Integer).Value = Convert.ToInt32(id);
+            cmd.Parameters.Add(":l", NpgsqlDbType.Varchar).Value = login;
             NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -140,27 +141,48 @@ namespace svod_admin.Pages.Subject
                 IcanFlags = 0;
             }
 
-            using (NpgsqlConnection update = new (connectionString))
-            {
-                update.Open();
-                using (NpgsqlCommand cmd = update.CreateCommand())
-                {
-                    cmd.CommandText = "update svod2.subjectusers SET password=:pwd,passwordupto=:upto,note=:nt,myformkinds=:fk,"
-                        + "icanflags=:cf,changedate=:chdt,changer=:ch where login=:lg and subject=:sub";
-                    cmd.Parameters.Add(":pwd", NpgsqlDbType.Varchar).Value = Password;
-                    cmd.Parameters.Add(":upto", NpgsqlDbType.Date).Value = Passwordupto != null ? Passwordupto : DBNull.Value;
-                    cmd.Parameters.Add(":chdt", NpgsqlDbType.Date).Value = DateTime.Now;
-                    cmd.Parameters.Add(":nt", NpgsqlDbType.Varchar).Value = Note != null ? Note : DBNull.Value;
-                    cmd.Parameters.Add(":fk", NpgsqlDbType.Varchar).Value = string.IsNullOrEmpty(myFormkinds) ? DBNull.Value : myFormkinds;
-                    cmd.Parameters.Add(":cf", NpgsqlDbType.Bigint).Value = (long)IcanFlags;
-                    cmd.Parameters.Add(":lg", NpgsqlDbType.Varchar).Value = Login;
-                    cmd.Parameters.Add(":sub", NpgsqlDbType.Integer).Value = Id;
-                    cmd.Parameters.Add(":ch", NpgsqlDbType.Varchar).Value = "admin";
-                    cmd.ExecuteNonQuery();
-                }
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            using NpgsqlCommand cnt = conn.CreateCommand();
+            cnt.CommandText = $"select count(*) from svod2.subjectusers where subject={Id}";
 
-                update.Close();
+            int countUsers = 0;
+            NpgsqlDataReader reader = cnt.ExecuteReader();
+            while (reader.Read())
+            {
+                if (!reader.IsDBNull(0))
+                    countUsers = reader.GetInt32(0);
             }
+            conn.Close();
+
+            using NpgsqlConnection update = new(connectionString);
+            update.Open();
+            using NpgsqlCommand cmd = update.CreateCommand();
+
+            if (countUsers == 0)
+            {
+                cmd.CommandText = "insert into svod2.subjectusers(password, passwordupto, note, myformkinds, " +
+                    "icanflags, changedate, changer, login, subject) "
+                  + "values(:pwd,:upto,:nt,:fk,:cf,:chdt,:ch,:lg,:sub)";
+            }
+            else
+            {
+                cmd.CommandText = "update svod2.subjectusers SET password=:pwd,passwordupto=:upto,note=:nt,myformkinds=:fk,"
+                        + "icanflags=:cf,changedate=:chdt,changer=:ch where login=:lg and subject=:sub";
+            }
+                
+            cmd.Parameters.Add(":pwd", NpgsqlDbType.Varchar).Value = Password;
+            cmd.Parameters.Add(":upto", NpgsqlDbType.Date).Value = Passwordupto != null ? Passwordupto : DBNull.Value;
+            cmd.Parameters.Add(":chdt", NpgsqlDbType.Date).Value = DateTime.Now;
+            cmd.Parameters.Add(":nt", NpgsqlDbType.Varchar).Value = Note != null ? Note : DBNull.Value;
+            cmd.Parameters.Add(":fk", NpgsqlDbType.Varchar).Value = string.IsNullOrEmpty(myFormkinds) ? DBNull.Value : myFormkinds;
+            cmd.Parameters.Add(":cf", NpgsqlDbType.Bigint).Value = (long)IcanFlags;
+            cmd.Parameters.Add(":lg", NpgsqlDbType.Varchar).Value = Login;
+            cmd.Parameters.Add(":sub", NpgsqlDbType.Integer).Value = Id;
+            cmd.Parameters.Add(":ch", NpgsqlDbType.Varchar).Value = "admin";
+            cmd.ExecuteNonQuery();
+
+            update.Close();
 
             return Redirect("/Subject/SubjectUsers");
         }

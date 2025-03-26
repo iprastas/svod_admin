@@ -9,18 +9,18 @@
     <form method="post" class="row g-3 editform">
         <div class="row">
             <div class="col-2">
-                <label for="IdInput" class="form-label">Id предприятия</label>
+                <label for="IdInput" class="form-label">Id предприятия *</label>
                 <input type="text" class="form-control" name="Id" id="IdInput" value="@Model.Id" readonly>
             </div>
             <div class="col-md-2">
-                <label for="LoginInput" class="form-label">Логин</label>
+                <label for="LoginInput" class="form-label">Логин *</label>
                 <input type="text" class="form-control" name="Login" id="LoginInput" value="@Model.Login" required>
             </div>
             <div class="col-md-4">
-                <label for="Password" class="form-label">Пароль</label>
+                <label for="Password" class="form-label">Пароль *</label>
                 <div class="input-group mb-3">
                     <button class="btn btn-success btn-generate-password" type="button" asp-page-handler="edit" id="Password">Сгенерировать</button>
-                    <input type="text" class="form-control" name="Password" value="@Model.Password" aria-label="Сгенерированный пароль" readonly>
+                    <input type="text" class="form-control" name="Password" value="@Model.Password" aria-label="Сгенерированный пароль" readonly required>
                 </div>
             </div>
         </div>
@@ -66,8 +66,14 @@
                 }
             </div>
         </div>
-        <div class="d-grid gap-2 d-md-block">
-            <button type="submit" asp-page-handler="edit" class="btn btn-primary">Сохранить изменения</button>
+        <div class="d-flex gap-2">
+            <div title="@(string.IsNullOrEmpty(Model.Password) ? "Заполните обязательные для ввода поля" : "")">
+                <button type="submit" asp-page-handler="edit" class="btn btn-primary" id="saveSubUsButton"
+                        disabled="@(string.IsNullOrEmpty(Model.Password))"
+                        title="@(string.IsNullOrEmpty(Model.Password) ? "Заполните обязательные для ввода поля" : "")">
+                    Сохранить изменения
+                </button>
+            </div>
             <button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
         </div>
     </form>

@@ -22,6 +22,7 @@ jQuery(function () {
             type: 'GET',
             success: function (data) {
                 $("input[name='Password']").val(data.password);
+                document.getElementById('saveSubUsButton').disabled = false;
             },
             error: function (error) {
                 // Обработка ошибок
