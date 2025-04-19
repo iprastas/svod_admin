@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NpgsqlTypes;
 using Npgsql;
 
 namespace svod_admin.Pages.Territory
@@ -60,6 +61,41 @@ namespace svod_admin.Pages.Territory
         public IActionResult OnPostEdit(string login, int id)
         {
             return new RedirectToPageResult("/Territory/EditTerUser", new { login, id });
+        }
+
+        public IActionResult OnGetDelete(string login, int territory)
+        {
+            string? connectionString = configuration.GetConnectionString("DefaultConnection");
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            using NpgsqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                string delFinegrained = $"delete from svod2.territoryfinegrained where territory = :ter";
+                using NpgsqlCommand DelFinegrained = new(delFinegrained, conn);
+                DelFinegrained.Parameters.Add(":ter", NpgsqlDbType.Integer).Value = territory;
+                DelFinegrained.Transaction = transaction;
+                DelFinegrained.ExecuteNonQuery();
+
+                string delUser = $"delete from svod2.territoryusers where login = :lg and territory = :ter";
+                using NpgsqlCommand DelUser = new(delUser, conn);
+                DelUser.Parameters.Add(":ter", NpgsqlDbType.Integer).Value = territory;
+                DelUser.Parameters.Add(":lg", NpgsqlDbType.Varchar).Value = login != null ? login : DBNull.Value; ;
+                DelUser.Transaction = transaction;
+                DelUser.ExecuteNonQuery(); 
+
+                transaction.Commit();
+
+                string mess = "Пользователь успешно удален.";
+                return new JsonResult(new { result = true, message = mess });
+            }
+            catch (NpgsqlException e)
+            {
+                transaction.Rollback();
+
+                string mess = $"Действие отменено.\nПроизошла ошибка {e.Message} errcode = {e.ErrorCode}.";
+                return new JsonResult(new { result = false, message = mess });
+            }
         }
 
         public IActionResult OnPostForm(string login, int territoryid)

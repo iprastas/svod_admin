@@ -42,32 +42,14 @@ namespace svod_admin.Pages.Target
         }
         public void OnGet()
         {
-            Message = Convert.ToString(RouteData.Values["Message"]);
-            if (Message != "")
-            {
-                var parts = Message.Split(' ');
-                Message = parts[0];
-                FormID = Convert.ToInt32(parts[1]);
-
-                switch (Message)
-                {
-                    case "success":
-                        Message = $"Успешно! Форма {FormID} изменена.";
-                        Success = true;
-                        break;
-                    case "error":
-                        Message = $"Ошибка! Форма {FormID} не была изменена.";
-                        Success = false;
-                        break;
-                }
-            }
+            Login = Convert.ToString(RouteData.Values["login"]);
 
             using NpgsqlConnection conn = new (connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = "select t.form,coalesce(f.name,f.short),t.targetuser,t.permission,t.username,t.changedate "
                 + "from svod2.targetfinegrained t left outer join svod2.form f on t.form = f.form "
-                + $"where t.targetuser='{RouteData.Values["login"]}' order by f.name ";
+                + $"where t.targetuser='{Login}' order by f.name ";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             int i = 1;
             while (reader.Read())
@@ -112,22 +94,31 @@ namespace svod_admin.Pages.Target
             return new RedirectToPageResult("/Target/TargetFinegrained", new { login });
         }
 
-        public IActionResult OnPostEdit(string login, int formid, int number)
+        public IActionResult OnGetEdit(string login, int formid, int num)
         {
             var permission = Request.Form["Permission"];
-            using (NpgsqlConnection conn = new (connectionString))
+            try
             {
+                using NpgsqlConnection conn = new(connectionString);
                 conn.Open();
+
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.targetfinegrained set permission=:perm where form=:formid and targetuser=:login";
-                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[number - 1]);
+                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[num - 1]);
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
                 cmd.Parameters.Add(":login", NpgsqlDbType.Varchar).Value = login;
+
                 int res = cmd.ExecuteNonQuery();
                 conn.Close();
+
+                string mess = $"Форма {FormID} успешно обновлена.";
+                return new JsonResult(new { result = true, message = mess });
             }
-            string message = $"success {FormID}";
-            return new RedirectToPageResult("/Target/TargetFinegrained", new { login, message });
+            catch (NpgsqlException e)
+            {
+                string mess = $"Действие отменено.\nПроизошла ошибка {e.Message} errcode = {e.ErrorCode}.";
+                return new JsonResult(new { result = false, message = mess });
+            }
         }
     }
 }

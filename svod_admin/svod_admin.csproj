@@ -10,4 +10,10 @@
     <PackageReference Include="Npgsql" Version="8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\js\functions.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

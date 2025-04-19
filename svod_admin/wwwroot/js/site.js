@@ -16,13 +16,14 @@ jQuery(function () {
     $.each($('.navbar-nav').find('li'), function () {
         $(this).toggleClass('active', window.location.pathname.indexOf($(this).find('a').attr('href')) > -1);
     });
+
     $('#Password').on('click', function () {
         $.ajax({
-            url: '/Pwd/Index', 
+            url: '/Pwd/Index',
             type: 'GET',
             success: function (data) {
                 $("input[name='Password']").val(data.password);
-                document.getElementById('saveSubUsButton').disabled = false;
+                //document.getElementById('saveSubUsButton').disabled = false;
             },
             error: function (error) {
                 // Обработка ошибок

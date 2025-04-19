@@ -62,6 +62,38 @@ namespace svod_admin.Pages.Target
             return new RedirectToPageResult("/Target/EditTarUser", new { login });
         }
 
+        public IActionResult OnGetDelete(string login)
+        {
+            string? connectionString = configuration.GetConnectionString("DefaultConnection");
+            using NpgsqlConnection conn = new(connectionString);
+            conn.Open();
+            using NpgsqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                string delFinegrained = $"delete from svod2.targetfinegrained where targetuser = \'{login}\'";
+                using NpgsqlCommand DelFinegrained = new(delFinegrained, conn);
+                DelFinegrained.Transaction = transaction;
+                DelFinegrained.ExecuteNonQuery();
+
+                string delUser = $"delete from svod2.targetusers where login = \'{login}\'";
+                using NpgsqlCommand DelUser = new(delUser, conn);
+                DelUser.Transaction = transaction;
+                DelUser.ExecuteNonQuery();
+
+                transaction.Commit();
+
+                string mess = "Пользователь успешно удален.";
+                return new JsonResult(new { result = true, message = mess });
+            }
+            catch (NpgsqlException e)
+            {
+                transaction.Rollback();
+
+                string mess = $"Действие отменено.\nПроизошла ошибка {e.Message} errcode = {e.ErrorCode}.";
+                return new JsonResult(new { result = false, message = mess });
+            }
+        }
+
         public IActionResult OnPostForm(string login)
         {
             return new RedirectToPageResult("/Target/TargetFinegrained", new { login });
