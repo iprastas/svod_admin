@@ -34,12 +34,15 @@ namespace svod_admin.Pages.Subject
 
         public void OnGet()
         {
+            SubjectID = Convert.ToInt32(RouteData.Values["subjectid"] as string);
+            Login = Convert.ToString(RouteData.Values["login"]);
+            
             using NpgsqlConnection conn = new (ConnectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
             cmd.CommandText = $"select form,substring(coalesce(name, short) from 0 for 150) from svod2.form where form>0 and "
             + " coalesce(upto,current_date)>=current_date and form not in(select form from svod2.subjectfinegrained  "
-            + $" where subjectuser='{RouteData.Values["login"]}' and subject='{RouteData.Values["subjectid"]}') order by form;";
+            + $" where subjectuser='{Login}' and subject='{SubjectID}') order by form;";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -64,7 +67,7 @@ namespace svod_admin.Pages.Subject
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "insert into svod2.subjectfinegrained(form,subject,subjectuser,permission,changedate) values(:f,:s,:u,:p,:cd)";
                 cmd.Parameters.Add(":f", NpgsqlDbType.Integer);
-                cmd.Parameters.Add(":s", NpgsqlDbType.Integer).Value = Convert.ToInt32(RouteData.Values["subjectid"] as string);
+                cmd.Parameters.Add(":s", NpgsqlDbType.Integer).Value = SubjectID;
                 cmd.Parameters.Add(":u", NpgsqlDbType.Varchar).Value = Login;
                 cmd.Parameters.Add(":p", NpgsqlDbType.Integer).Value = Permission;
                 cmd.Parameters.Add(":cd", NpgsqlDbType.Date).Value = DateTime.Now;

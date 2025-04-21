@@ -42,25 +42,8 @@ namespace svod_admin.Pages.Territory
         }
         public void OnGet()
         {
-            Message = Convert.ToString(RouteData.Values["Message"]);
-            if (Message != "")
-            {
-                var parts = Message.Split(' ');
-                Message = parts[0];
-                FormID = Convert.ToInt32(parts[1]);
-
-                switch (Message)
-                {
-                    case "success":
-                        Message = $"Успешно! Форма {FormID} изменена.";
-                        Success = true;
-                        break;
-                    case "error":
-                        Message = $"Ошибка! Форма {FormID} не была изменена.";
-                        Success = false;
-                        break;
-                }
-            }
+            Login = TempData["Login"]?.ToString();
+            TerritoryID = Convert.ToInt32(TempData["TerritoryID"]);
 
             using NpgsqlConnection conn = new(connectionString);
             conn.Open();
@@ -69,7 +52,7 @@ namespace svod_admin.Pages.Territory
                 + "from svod2.territoryfinegrained tf"
                 + " left outer join svod2.form f on tf.form = f.form "
                 + " left outer join svod2.territory t on tf.territory = t.territory "
-                + $"where tf.territoryusers='{RouteData.Values["login"]}' order by f.name ";
+                + $"where tf.territoryusers='{Login}' order by f.name ";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             int i = 1;
             while (reader.Read())
@@ -117,26 +100,34 @@ namespace svod_admin.Pages.Territory
                 int res = cmd.ExecuteNonQuery();
                 conn.Close();
             }
-            return new RedirectToPageResult("/Territory/TerritoryFinegrained", new { login, territoryid });
+            TempData["Login"] = Login;
+            TempData["TerritoryID"] = TerritoryID;
+            return RedirectToPage("/Territory/TerritoryFinegrained");
         }
 
-        public IActionResult OnPostEdit(string login, int formid, int territoryid, int number)
+        public IActionResult OnGetEdit(string login, int formid, int territoryid, int permission, int number)
         {
-            var permission = Request.Form["Permission"];
-            using (NpgsqlConnection conn = new (connectionString))
+            try
             {
+                using NpgsqlConnection conn = new(connectionString);
                 conn.Open();
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.territoryfinegrained set permission=:perm where form=:formid and territoryusers=:login and territory=:territoryid";
-                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[number - 1]);
+                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = permission;
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
-                cmd.Parameters.Add(":login", NpgsqlDbType.Varchar).Value = login;
+                cmd.Parameters.Add(":login", NpgsqlDbType.Varchar).Value = login; 
                 cmd.Parameters.Add(":territoryid", NpgsqlDbType.Integer).Value = territoryid;
-                int res = cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
                 conn.Close();
+
+                string mess = $"Форма {formid} успешно обновлена.";
+                return new JsonResult(new { result = true, message = mess });
             }
-            string message = $"success {FormID}";
-            return new RedirectToPageResult("/Territory/TerritoryFinegrained", new { login, territoryid, message });
+            catch (NpgsqlException e)
+            {
+                string mess = $"Действие отменено.\nПроизошла ошибка {e.Message} errcode = {e.ErrorCode}.";
+                return new JsonResult(new { result = false, message = mess });
+            }
         }
     }
 }

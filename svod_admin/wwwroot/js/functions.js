@@ -73,8 +73,11 @@ function deleteTerr(login, territory, button) {
         });
 }
 
-function saveTarF(login, formid, num) {
-    fetch("/Target/TargetFinegrained?handler=Edit&login=" + login + "&formid=" + formid + "&num=" + num)
+function saveSubF(login, formid, subjectid, num) {
+    const selectElement = document.querySelector(`#Permission_${formid}`); 
+    const permission = selectElement?.value;
+
+    fetch("/Subject/SubjectFinegrained?handler=Edit&login=" + login + "&formid=" + formid + "&subjectid=" + subjectid + "&permission=" + permission + "&num=" + num) // 
         .then(response => {
             if (!response.ok) throw new Error("Network error");
             return response.json();
@@ -84,7 +87,43 @@ function saveTarF(login, formid, num) {
         })
         .catch(error => {
             console.error("Ошибка:", error);
-            showToast(false, "Произошла ошибка при удалении");
+            showToast(false, "Произошла ошибка при сохранении.");
+        });
+}
+
+function saveTarF(login, formid, num) {
+    const selectElement = document.querySelector(`#Permission_${formid}`);
+    const permission = selectElement?.value;
+
+    fetch("/Target/TargetFinegrained?handler=Edit&login=" + login + "&formid=" + formid + "&permission=" + permission + "&num=" + num)
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            showToast(data.result, data.message);
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            showToast(false, "Произошла ошибка при сохранении.");
+        });
+}
+
+function saveTerF(login, formid, territoryid, num) {
+    const selectElement = document.querySelector(`#Permission_${formid}`);
+    const permission = selectElement?.value;
+
+    fetch("/Territory/TerritoryFinegrained?handler=Edit&login=" + login + "&formid=" + formid + "&territoryid=" + territoryid + "&permission=" + permission + "&num=" + num)
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            showToast(data.result, data.message);
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            showToast(false, "Произошла ошибка при сохранении.");
         });
 }
 

@@ -56,30 +56,11 @@
                                                 <img src="~/person-plus.svg">
                                             </span>
                                         </button>
-                                        <button type="button" id="deleteTerritoryUser" data-bs-toggle="modal" data-bs-target="#TerritoryDelModal_@us.login" class="btn btn-outline-danger" title="Удалить">
-                                            <span>
-                                                <img src="~/trash3.svg">
-                                            </span>
-                                        </button>
-                                        <div class="modal fade" id="TerritoryDelModal_@us.login" tabindex="-1" aria-labelledby="TerritoryDelModalLabel_@us.login" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="TerritoryDelModalLabel_@us.login">Вы действительно хотите удалить пользователя @us.login?</h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                                        <button type="button" class="btn btn-danger" id="deleteTerritory" onclick="deleteTerr('@us.login', @us.id, this)">Удалить</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 }
                                 else{
                                     <div class="d-flex gap-2 mb-2">
-                                        <button type="submit" asp-page-handler="edit" asp-route-login="@us.login" class="btn btn-outline-success actions" title="Изменить">
+                                        <button type="submit" asp-page-handler="edit" asp-route-login="@us.login" asp-route-id="@us.id" class="btn btn-outline-success actions" title="Изменить">
                                             <span>
                                                 <img src="~/pencil-square.svg">
                                             </span>
@@ -98,14 +79,14 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                                        <button type="button" class="btn btn-danger" id="deleteTerritory" onclick="deleteTerr('@us.login', this)">Удалить</button>
+                                                        <button type="button" class="btn btn-danger" id="deleteTerritory" onclick="deleteTerr('@us.login',@us.id, this)">Удалить</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div>
-                                        <button type="submit" asp-page-handler="form" asp-route-login="@us.login" class="btn btn-outline-success actions" title="Настройка форм">
+                                        <button type="submit" asp-page-handler="form" asp-route-login="@us.login" asp-route-territoryid="@us.id" class="btn btn-outline-success actions" title="Настройка форм">
                                             <span>
                                                 <img src="~/card-text.svg">
                                             </span>

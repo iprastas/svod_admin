@@ -42,7 +42,8 @@ namespace svod_admin.Pages.Target
         }
         public void OnGet()
         {
-            Login = Convert.ToString(RouteData.Values["login"]);
+            Login = TempData["Login"]?.ToString();
+            TempData.Keep();
 
             using NpgsqlConnection conn = new (connectionString);
             conn.Open();
@@ -94,9 +95,8 @@ namespace svod_admin.Pages.Target
             return new RedirectToPageResult("/Target/TargetFinegrained", new { login });
         }
 
-        public IActionResult OnGetEdit(string login, int formid, int num)
+        public IActionResult OnGetEdit(string login, int formid, int permission, int num)
         {
-            var permission = Request.Form["Permission"];
             try
             {
                 using NpgsqlConnection conn = new(connectionString);
@@ -104,14 +104,14 @@ namespace svod_admin.Pages.Target
 
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.targetfinegrained set permission=:perm where form=:formid and targetuser=:login";
-                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = Convert.ToInt16(permission[num - 1]);
+                cmd.Parameters.Add(":perm", NpgsqlDbType.Smallint).Value = permission;
                 cmd.Parameters.Add(":formid", NpgsqlDbType.Integer).Value = formid;
                 cmd.Parameters.Add(":login", NpgsqlDbType.Varchar).Value = login;
 
                 int res = cmd.ExecuteNonQuery();
                 conn.Close();
 
-                string mess = $"Форма {FormID} успешно обновлена.";
+                string mess = $"Форма {formid} успешно обновлена.";
                 return new JsonResult(new { result = true, message = mess });
             }
             catch (NpgsqlException e)

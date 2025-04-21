@@ -53,7 +53,9 @@ namespace svod_admin.Pages.Territory
         }
         public IActionResult OnPostCancel()
         {
-            return new RedirectToPageResult("/Territory/TerritoryFinegrained", new { Login, TerritoryID });
+            TempData["Login"] = Login;
+            TempData["TerritoryID"] = TerritoryID;
+            return RedirectToPage("/Territory/TerritoryFinegrained");
         }
 
         public IActionResult OnPostCreate()
@@ -76,7 +78,9 @@ namespace svod_admin.Pages.Territory
                 cmd.Dispose();
                 conn.Close();
             }
-            return new RedirectToPageResult("/Territory/TerritoryFinegrained", new { Login, TerritoryID });
+            TempData["Login"] = Login;
+            TempData["TerritoryID"] = TerritoryID;
+            return RedirectToPage("/Territory/TerritoryFinegrained");
         }
     }
 }

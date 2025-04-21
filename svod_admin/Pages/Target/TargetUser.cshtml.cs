@@ -96,7 +96,8 @@ namespace svod_admin.Pages.Target
 
         public IActionResult OnPostForm(string login)
         {
-            return new RedirectToPageResult("/Target/TargetFinegrained", new { login });
+            TempData["Login"] = login;
+            return RedirectToPage("/Target/TargetFinegrained");
         }
 
         public IActionResult OnPostCreate()

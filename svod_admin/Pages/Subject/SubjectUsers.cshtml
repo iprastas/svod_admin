@@ -51,7 +51,7 @@
                             <td>@us.changedate</td>
                             <td>
                                 <div class="d-flex gap-2 mb-2">
-                                    <button type="submit" asp-page-handler="edit" asp-route-login="@us.login" class="btn btn-outline-success actions" title="Изменить">
+                                    <button type="submit" asp-page-handler="edit" asp-route-login="@us.login" asp-route-id="@us.id" class="btn btn-outline-success actions" title="Изменить">
                                         <span>
                                             <img src="~/pencil-square.svg">
                                         </span>
@@ -77,7 +77,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <button type="submit" asp-page-handler="form" asp-route-login="@us.login" class="btn btn-outline-success actions" title="Настройка форм">
+                                    <button type="submit" asp-page-handler="form" asp-route-login="@us.login" asp-route-subjectid="@us.id" class="btn btn-outline-success actions" title="Настройка форм">
                                         <span>
                                             <img src="~/card-text.svg">
                                         </span>

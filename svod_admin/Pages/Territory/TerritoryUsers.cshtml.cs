@@ -100,7 +100,9 @@ namespace svod_admin.Pages.Territory
 
         public IActionResult OnPostForm(string login, int territoryid)
         {
-            return new RedirectToPageResult("/Territory/TerritoryFinegrained", new { login, territoryid });
+            TempData["Login"] = login;
+            TempData["TerritoryID"] = territoryid;
+            return RedirectToPage("/Territory/TerritoryFinegrained");
         }
 
         public IActionResult OnPostCreate(int id)

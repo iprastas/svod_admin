@@ -1,4 +1,4 @@
-﻿@page "{login}"
+﻿@page
 @model svod_admin.Pages.Target.TargetFinegrainedModel
 @{
     ViewData["Title"] = "Формы МЖКХ";
@@ -11,7 +11,7 @@
         </div>
         <div class="col-auto">
             <form method="post">
-                <button type="submit" asp-page-handler="create" class="btn btn-success add-us">Добавить форму</button>
+                <button type="submit" asp-page-handler="create" asp-route-login="@Model.Login" class="btn btn-success add-us">Добавить форму</button>
             </form>
         </div>
     </div>
@@ -40,7 +40,7 @@
                             <td>@us.FormName</td>
                             <td>@us.Login</td>
                             <td>
-                                <select class="form-select" asp-for="@us.Permission" name="Permission" asp-items="Model.ListOfPermiss"></select>
+                                <select class="form-select" asp-for="@us.Permission" name="Permission" id="Permission_@us.FormID" asp-items="Model.ListOfPermiss"></select>
                             </td>
                             <td>@us.Username</td>
                             <td>@us.ChangeDate</td>

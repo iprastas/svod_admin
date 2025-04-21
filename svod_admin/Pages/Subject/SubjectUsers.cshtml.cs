@@ -99,7 +99,9 @@ namespace svod_admin.Pages.Subject
 
         public IActionResult OnPostForm(string login, int subjectid)
         {
-            return new RedirectToPageResult("/Subject/SubjectFinegrained", new { login, subjectid });
+            TempData["Login"] = login;
+            TempData["SubjectID"] = subjectid;
+            return RedirectToPage("/Subject/SubjectFinegrained");
         }
     }
 }
