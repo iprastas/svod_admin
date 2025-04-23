@@ -1,0 +1,89 @@
+﻿@page
+@model svod_admin.Pages.RegisterSubject.CreateSubjectModel
+@{
+	ViewData["Title"] = "Добавление предприятия";
+}
+
+<div class="container-fluid">
+	<form method="post" class="row g-3" id="SubForm">
+		<div class="row mb-4">
+			<div class="col-auto me-auto">
+				<label for="form_list" class="form-label">Мастер-форма*</label>
+				<input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
+			</div>
+			<div class="col-md-12">
+				<select class="form-select" id="form_list" asp-for="@Model.MasterID" asp-items="Model.Master" size="10"></select>
+			</div>
+		</div>
+		<div class="row mb-4">
+			<div class="col-md-1">
+				<label for="SubjectID" class="form-label">ID</label>
+				<input type="text" value="@Model.SubjectID" class="form-control" name="SubjectID" asp-for="@Model.SubjectID" id="SubjectID" disabled>
+			</div>
+			<div class="col-md-6">
+				<label for="inputName" class="form-label">Полное название*</label>
+				<input type="text" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputName">
+			</div>
+			<div class="col-md-3">
+				<label for="inputShort" class="form-label">Короткое название*</label>
+				<input type="text" class="form-control" name="SubjectShortName" asp-for="@Model.SubjectShortName" id="inputShort" maxlength="250">
+			</div>
+		</div>
+		<div class="row mb-4">
+			<div class="col-md-3">
+				<label for="inputInn" class="form-label">ИНН*</label>
+				<input type="text" class="form-control" name="Inn" asp-for="@Model.Inn" id="inputInn" maxlength="30">
+			</div>
+			<div class="col-md-3">
+				<label for="inputOkpo" class="form-label">ОКПО</label>
+				<input type="text" class="form-control" name="Okpo" asp-for="@Model.Okpo" id="inputOkpo" maxlength="30">
+			</div>
+			<div class="col-md-3">
+				<label for="inputOgrn" class="form-label">ОГРН</label>
+				<input type="text" class="form-control" name="Ogrn" asp-for="@Model.Ogrn" id="inputOgrn" maxlength="30">
+			</div>
+			<div class="col-md-3">
+				<label for="inputKpp" class="form-label">КПП</label>
+				<input type="text" class="form-control" name="Kpp" asp-for="@Model.Kpp" id="inputKpp" maxlength="30">
+			</div>
+		</div>
+		<div class="row mb-4 d-flex">
+			<div class="col-md-5">
+				<div class="col-md-3 me-2">
+					<label for="territory_list" class="form-label">Работает в*</label>
+					<input class="form-control" id="search_ter_inp" placeholder="Искать..." type="text" />
+				</div>
+				<div class="col-md">
+					<select class="form-select" id="territory_list" asp-for="@Model.TerritoryWorkID" asp-items="Model.TerritoryWork" size="10"></select>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="col-md-3 me-2">
+					<label for="branch_list" class="form-label">ОКВЕД*</label>
+					<input class="form-control" id="search_br_inp" placeholder="Искать..." type="text" />
+				</div>
+				<div class="col-md">
+					<select class="form-select" id="branch_list" asp-for="@Model.OkvedID" asp-items="Model.Okved" size="10"></select>
+				</div>
+			</div>
+		</div>
+		<div class="row mb-4">
+			<div class="col-md-2">
+				<label for="SinceDate" class="form-label">Действует c..</label>
+				<input type="date" class="form-control" asp-for="@Model.SinceDate" name="SinceDate" id="SinceDate">
+			</div>
+			<div class="col-md-2">
+				<label for="UptoDate" class="form-label">Действует до..</label>
+				<input type="date" class="form-control" asp-for="@Model.UptoDate" name="UptoDate" id="UptoDate">
+			</div>
+		</div>
+		<div class="d-grid gap-2 d-md-block mb-5">
+			<button type="button" class="btn btn-primary" id="saveSubjectBtn" onclick="saveSubject(@Model.SubjectID)" title="Сохранить">
+				Сохранить изменения
+			</button>
+			<button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+		</div>
+    </form>
+</div>
+
+<script src="~/js/functions.js" type="text/javascript" asp-append-version="true"></script>

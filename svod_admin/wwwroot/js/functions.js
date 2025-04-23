@@ -127,6 +127,33 @@ function saveTerF(login, formid, territoryid, num) {
         });
 }
 
+function saveSubject(id) {
+    const form = document.getElementById('SubForm');
+    const formData = new FormData(form);
+
+    fetch("/RegisterSubject/CreateSubject?handler=Create&id=" + id, {
+        method: 'POST',
+            headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        },
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            sessionStorage.setItem("toastResult", data.result);
+            sessionStorage.setItem("toastMessage", data.message);
+
+            window.location.href = "/RegisterSubject/RegisterSubject";
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            showToast(false, "Произошла ошибка при сохранении.");
+        });
+}
+
 function showToast(result, message) {
     const existing = document.getElementById("bottomToast");
     if (existing) { // Удаляем предыдущий тост, если есть
@@ -158,3 +185,61 @@ function showToast(result, message) {
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
 };
+
+function toggleClosedCompanies(checkbox) {
+    const table = document.getElementById("tuser-tbl");
+    const oldTbody = table.querySelector("tbody");
+
+    let path = "";
+    if (checkbox.checked) {
+        path = "/RegisterSubject/RegisterSubject?handler=ShowCloseSub";
+
+    } else {
+        path = "/RegisterSubject/RegisterSubject?handler=ShowOpenSub";
+    }
+    fetch(path)
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            oldTbody.remove();
+            const newTbody = document.createElement("tbody");
+
+            let rows = "";
+            data.list.forEach((sub) => {
+                rows += `
+                        <tr>
+                            <td>${sub.subjectID}</td>
+                            <td>${sub.masterID !== 0 ? sub.masterID + "-" + sub.masterName : ""}</td>
+                            <td>${sub.subjectName}</td>
+                            <td>${sub.ogrn}</td>
+                            <td>${sub.kpp}</td>
+                            <td>${sub.inn}</td>
+                            <td>${sub.okpo}</td>
+                            <td>${sub.territoryWork}</td>
+                            <td>${sub.okved}</td>
+                            <td>${sub.sinceDate}</td>
+                            <td>${sub.uptoDate}</td>
+                            <td>${sub.username}</td>
+                            <td>${sub.changeDate}</td>
+                            <td>
+                                <form method="post" action="/RegisterSubject/RegisterSubject?handler=Edit&id=${sub.subjectID}">
+                                    <button type="submit" class="btn btn-outline-success actions" title="Изменить">
+                                        <span>
+                                            <img src="/pencil-square.svg" />
+                                        </span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                `;
+            });
+            newTbody.innerHTML = rows;
+            table.appendChild(newTbody);
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            showToast(false, "Произошла ошибка при выборе предприятий.");
+        });
+}

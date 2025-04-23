@@ -3,3 +3,124 @@
 @{
 	ViewData["Title"] = "Реестр предприятий";
 }
+
+<div class="container-fluid">
+    <div class="row head">
+        <div class="col d-flex align-items-center gap-4">
+            <input class="form-control w-auto" id="search_inp" placeholder="Искать..." type="text" />
+
+            <div class="form-check form-switch d-flex align-items-center flex-nowrap" style="min-width: 300px;">
+                <input class="form-check-input me-2" type="checkbox" role="switch" id="flexSwitchCheckDefault" onchange="toggleClosedCompanies(this)">
+                <label class="form-check-label white-space-nowrap" for="flexSwitchCheckDefault">
+                    Показать закрытые предприятия
+                </label>
+            </div>
+        </div>
+        
+        <div class="col-auto text-center">
+            <form method="post">
+                <button type="submit" asp-page-handler="create" class="btn btn-success add-us">Добавить предприятие</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row table">
+        <form method="post">
+            <table class="table table-hover table_form" id="tuser-tbl">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Родитель</th>
+                        <th scope="col">Название формы</th>
+                        <th scope="col">ОГРН</th>
+                        <th scope="col">КПП</th>
+                        <th scope="col">ИНН</th>
+                        <th scope="col">ОКПО</th>
+                        <th scope="col">Работает в</th>
+                        <th scope="col">ОКВЕД</th>
+                        <th scope="col">Действует c..</th>
+                        <th scope="col">Действует до..</th>
+                        <th scope="col">Изменял</th>
+                        <th scope="col">Дата изменения</th>
+                        <th scope="col">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var us in Model.SubjectList)
+                    {
+                        <tr>
+                            <td>@us.SubjectID</td>
+                            <td>@(@us.MasterID != 0 ? us.MasterID + "-" + us.MasterName : "")</td>
+                            <td>@us.SubjectName</td>
+                            <td>@us.Ogrn</td>
+                            <td>@us.Kpp</td>
+                            <td>@us.Inn</td>
+                            <td>@us.Okpo</td>
+                            <td>@us.TerritoryWork</td>
+                            <td>@us.Okved</td>
+                            <td>@us.SinceDate</td>
+                            <td>@us.UptoDate</td>
+                            <td>@us.Username</td>
+                            <td>@us.ChangeDate</td>
+                            <td>
+                                <button type="submit" asp-page-handler="Edit" asp-route-formid="@us.SubjectID" class="btn btn-outline-success actions" title="Изменить">
+                                    <span>
+                                        <img src="~/pencil-square.svg">
+                                    </span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
+
+<script src="~/js/functions.js" type="text/javascript" asp-append-version="true"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const result = sessionStorage.getItem("toastResult");
+        const message = sessionStorage.getItem("toastMessage");
+
+        if (result !== null && message !== null) {
+            showToast(result === "true", message);
+            sessionStorage.removeItem("toastResult");
+            sessionStorage.removeItem("toastMessage");
+        }
+    });
+
+        function showToast(result, message) {
+        const existing = document.getElementById("bottomToast");
+        if (existing) { // Удаляем предыдущий тост, если есть
+            existing.remove();
+        }
+
+        const toastContainer = $(".toast-container");
+        toastContainer.empty();
+
+        const toastHtml = `
+                        <div class="toast text-white ${result ? 'bg-success' : 'bg-danger'} border-0"
+                             id="bottomToast"
+                             role="alert"
+                             aria-live="assertive"
+                             aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    ${message}
+                                </div>
+                                <button type="button"
+                                        class="btn-close btn-close-white me-2 m-auto"
+                                        data-bs-dismiss="toast"
+                                        aria-label="Close"></button>
+                            </div>
+                        </div>`;
+
+        toastContainer.append(toastHtml);
+        const toastEl = document.getElementById("bottomToast");
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    };
+
+</script>
