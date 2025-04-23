@@ -146,7 +146,7 @@ namespace svod_admin.Pages.RegisterSubject
 
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = text;
-                //cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
                 conn.Close();
 
                 string mess = $"Предприятие ${SubjectID} - ${SubjectShortName} успешно создано.";
