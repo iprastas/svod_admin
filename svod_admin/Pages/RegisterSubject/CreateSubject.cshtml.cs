@@ -56,6 +56,12 @@ namespace svod_admin.Pages.RegisterSubject
             cmd.Dispose();
             conn.Close();
 
+            SelectListItem startitem = new()
+            {
+                Value = "0",
+                Text = "Выберите мастер-предприятие"
+            };
+            Master.Add(startitem);
             conn.Open();
             cmd = conn.CreateCommand();
             cmd.CommandText = "select s.subject, coalesce(s.name, s.short) from svod2.subject s where " +
@@ -126,7 +132,7 @@ namespace svod_admin.Pages.RegisterSubject
             {
                 StringBuilder ins = new("INSERT INTO svod2.subject(subject,");
                 StringBuilder val = new($"VALUES({id},");
-                ins.Append("master,"); val.Append($"{MasterID},");
+                ins.Append(MasterID != 0 ? "master," : ""); val.Append(MasterID != 0? $"{MasterID}," : "");
                 ins.Append(SubjectShortName != null ? "short," : ""); val.Append(SubjectShortName != null ? "\'" + SubjectShortName + "\'," : "");
                 ins.Append(SubjectName != null ? "name," : ""); val.Append(SubjectName != null ? "\'" + SubjectName + "\'," : "");
                 ins.Append(Ogrn != null ? "ogrn," : ""); val.Append(Ogrn != null ? "\'" + Ogrn + "\'," : "");
@@ -134,7 +140,7 @@ namespace svod_admin.Pages.RegisterSubject
                 ins.Append(Inn != null ? "inn," : ""); val.Append(Inn != null ? "\'" + Inn + "\'," : "");
                 ins.Append(Okpo != null ? "okpo," : ""); val.Append(Okpo != null ? "\'" + Okpo + "\'," : "");
                 ins.Append("territorywork,"); val.Append($"{TerritoryWorkID},");
-                ins.Append("okved,"); val.Append($"{OkvedID},");
+                ins.Append(OkvedID != 0 ? "okved," : ""); val.Append(OkvedID != 0? $"{OkvedID}," : "");
                 ins.Append(SinceDate != null ? "since," : ""); val.Append(SinceDate != null ? "\'" + SinceDate + "\'," : "");
                 ins.Append(UptoDate != null ? "upto," : ""); val.Append(UptoDate != null ? "\'" + UptoDate + "\'," : "");
                 ins.Append("username) "); val.Append("\'svod_admin\');");
@@ -149,7 +155,7 @@ namespace svod_admin.Pages.RegisterSubject
                 cmd.ExecuteNonQuery();
                 conn.Close();
 
-                string mess = $"Предприятие ${SubjectID} - ${SubjectShortName} успешно создано.";
+                string mess = $"Предприятие {id} - {SubjectShortName} успешно создано.";
                 return new JsonResult(new { result = true, message = mess });
             }
             catch (NpgsqlException ex) {

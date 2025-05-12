@@ -56,7 +56,12 @@
                                             <img src="~/pencil-square.svg">
                                         </span>
                                     </button>
-                                    <button type="button" id="deleteSubjectUser" data-bs-toggle="modal" data-bs-target="#SubjectDelModal_@us.login" class="btn btn-outline-danger" title="Удалить">
+                                    <button type="submit" asp-page-handler="form" asp-route-login="@us.login" asp-route-subjectid="@us.id" class="btn btn-outline-success actions" title="Настройка форм">
+                                        <span>
+                                            <img src="~/card-text.svg">
+                                        </span>
+                                    </button>
+                                    <button type="button" id="deleteSubjectUser" data-bs-toggle="modal" data-bs-target="#SubjectDelModal_@us.login" class="btn btn-outline-danger actions" title="Удалить">
                                         <span>
                                             <img src="~/trash3.svg">
                                         </span>
@@ -75,13 +80,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <button type="submit" asp-page-handler="form" asp-route-login="@us.login" asp-route-subjectid="@us.id" class="btn btn-outline-success actions" title="Настройка форм">
-                                        <span>
-                                            <img src="~/card-text.svg">
-                                        </span>
-                                    </button>
                                 </div>
                             </td>
                         </tr>

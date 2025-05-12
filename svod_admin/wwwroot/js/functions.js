@@ -154,6 +154,33 @@ function saveSubject(id) {
         });
 }
 
+function editSubject(id) {
+    const form = document.getElementById('SubForm');
+    const formData = new FormData(form);
+
+    fetch("/RegisterSubject/EditSubject/"+ id +"?handler=Save&id=" + id, {
+        method: 'POST',
+        headers: {
+            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        },
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            sessionStorage.setItem("toastResult", data.result);
+            sessionStorage.setItem("toastMessage", data.message);
+
+            window.location.href = "/RegisterSubject/RegisterSubject";
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+            showToast(false, "Произошла ошибка при сохранении.");
+        });
+}
+
 function showToast(result, message) {
     const existing = document.getElementById("bottomToast");
     if (existing) { // Удаляем предыдущий тост, если есть

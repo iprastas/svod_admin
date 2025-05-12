@@ -8,7 +8,7 @@
 	<form method="post" class="row g-3" id="SubForm">
 		<div class="row mb-4">
 			<div class="col-auto me-auto">
-				<label for="form_list" class="form-label">Мастер-форма*</label>
+				<label for="form_list" class="form-label">Мастер-предприятие</label>
 				<input class="form-control" id="search_inp" placeholder="Искать..." type="text" />
 			</div>
 			<div class="col-md-12">
@@ -22,16 +22,16 @@
 			</div>
 			<div class="col-md-6">
 				<label for="inputName" class="form-label">Полное название*</label>
-				<input type="text" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputName">
+				<input type="text" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputName" required>
 			</div>
 			<div class="col-md-3">
-				<label for="inputShort" class="form-label">Короткое название*</label>
+				<label for="inputShort" class="form-label">Короткое название</label>
 				<input type="text" class="form-control" name="SubjectShortName" asp-for="@Model.SubjectShortName" id="inputShort" maxlength="250">
 			</div>
 		</div>
 		<div class="row mb-4">
 			<div class="col-md-3">
-				<label for="inputInn" class="form-label">ИНН*</label>
+				<label for="inputInn" class="form-label">ИНН</label>
 				<input type="text" class="form-control" name="Inn" asp-for="@Model.Inn" id="inputInn" maxlength="30">
 			</div>
 			<div class="col-md-3">
@@ -54,12 +54,12 @@
 					<input class="form-control" id="search_ter_inp" placeholder="Искать..." type="text" />
 				</div>
 				<div class="col-md">
-					<select class="form-select" id="territory_list" asp-for="@Model.TerritoryWorkID" asp-items="Model.TerritoryWork" size="10"></select>
+					<select class="form-select" id="territory_list" asp-for="@Model.TerritoryWorkID" asp-items="Model.TerritoryWork" size="10" required></select>
 				</div>
 			</div>
 			<div class="col-md-5">
 				<div class="col-md-3 me-2">
-					<label for="branch_list" class="form-label">ОКВЕД*</label>
+					<label for="branch_list" class="form-label">ОКВЕД</label>
 					<input class="form-control" id="search_br_inp" placeholder="Искать..." type="text" />
 				</div>
 				<div class="col-md">
