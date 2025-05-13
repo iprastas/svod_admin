@@ -114,7 +114,7 @@ namespace svod_admin.Pages.RegisterSubject
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.subject SET short=:shn,name=:n,ogrn=:ogrn,kpp=:kpp,inn=:inn,okpo=:okpo,"
                         + "territorywork=:terw,okved=:okved,since=:since,upto=:upto,changer=:ch where subject=:s";
-                cmd.Parameters.Add(":shn", NpgsqlDbType.Varchar).Value = SubjectShortName;
+                cmd.Parameters.Add(":shn", NpgsqlDbType.Varchar).Value = SubjectShortName != null ? SubjectShortName : DBNull.Value;
                 cmd.Parameters.Add(":n", NpgsqlDbType.Varchar).Value = SubjectName;
                 cmd.Parameters.Add(":ogrn", NpgsqlDbType.Varchar).Value = Ogrn != null ? Ogrn : DBNull.Value;
                 cmd.Parameters.Add(":kpp", NpgsqlDbType.Varchar).Value = Kpp != null ? Kpp : DBNull.Value;
