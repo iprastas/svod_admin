@@ -22,7 +22,7 @@
 			</div>
 			<div class="col-md-6">
 				<label for="inputName" class="form-label">Полное название*</label>
-				<input type="text" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputName" required>
+				<input type="text" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputSubName">
 			</div>
 			<div class="col-md-3">
 				<label for="inputShort" class="form-label">Короткое название</label>
@@ -54,12 +54,12 @@
 					<input class="form-control" id="search_ter_inp" placeholder="Искать..." type="text" />
 				</div>
 				<div class="col-md">
-					<select class="form-select" id="territory_list" asp-for="@Model.TerritoryWorkID" asp-items="Model.TerritoryWork" size="10" required></select>
+					<select class="form-select" id="territory_list" asp-for="@Model.TerritoryWorkID" asp-items="Model.TerritoryWork" size="10"></select>
 				</div>
 			</div>
 			<div class="col-md-5">
 				<div class="col-md-3 me-2">
-					<label for="branch_list" class="form-label">ОКВЕД</label>
+					<label for="branch_list" class="form-label">ОКВЭД</label>
 					<input class="form-control" id="search_br_inp" placeholder="Искать..." type="text" />
 				</div>
 				<div class="col-md">
@@ -78,12 +78,47 @@
 			</div>
 		</div>
 		<div class="d-grid gap-2 d-md-block mb-5">
-			<button type="button" class="btn btn-primary" id="saveSubjectBtn" onclick="saveSubject(@Model.SubjectID)" title="Сохранить">
-				Сохранить изменения
-			</button>
-			<button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+			<div class="d-grid gap-2 d-md-block mb-5">
+				<button type="button" class="btn btn-primary" id="saveSubjectBtn" onclick="saveSubject(@Model.SubjectID)" title="Сохранить">
+					Сохранить изменения
+				</button>
+				<button type="submit" asp-page-handler="cancel" class="btn btn-secondary">Отменить изменения</button>
+			</div>
 		</div>
     </form>
 </div>
 
 <script src="~/js/functions.js" type="text/javascript" asp-append-version="true"></script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const nameInput = document.getElementById('inputSubName');
+		const territoryList = document.getElementById('territory_list');
+		const saveButton = document.getElementById('saveSubjectBtn');
+
+		// Функция для проверки всех условий и управления кнопкой
+		function updateSaveButtonState() {
+			const isNameFilled = nameInput.value.trim() !== '';
+			const isTerritorySelected = territoryList.value !== '';
+
+			if (isNameFilled && isTerritorySelected) {
+				saveButton.disabled = false;
+				saveButton.parentElement.title = "";
+			} else {
+				saveButton.disabled = true;
+				let message = "Заполните обязательные для ввода поля: ";
+				if (!isNameFilled) message += "Полное название, ";
+				if (!isTerritorySelected) message += "Работает в";
+				message = message.replace(/, $/, ""); // Удаляем последнюю запятую
+				saveButton.parentElement.title = message;
+			}
+		}
+
+		// Обработчики событий
+		nameInput.addEventListener('input', updateSaveButtonState);
+		territoryList.addEventListener('change', updateSaveButtonState);
+
+		// Проверка при загрузке страницы
+		updateSaveButtonState();
+	});
+</script>

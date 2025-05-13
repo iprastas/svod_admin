@@ -95,43 +95,8 @@ namespace svod_admin.Pages.RegisterSubject
             cmd.Dispose();
             conn.Close();
 
-            conn.Open();
-            cmd = conn.CreateCommand();
-            cmd.CommandText = "select t.territory, t.name from svod2.territory t " +
-                " order by t.name;";
-            reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                SelectListItem item = new()
-                {
-                    Value = reader.GetInt32(0).ToString()
-                };
-                if (!reader.IsDBNull(1))
-                    item.Text = reader.GetString(1);
-                TerritoryWork.Add(item);
-            }
-            reader.Close();
-            cmd.Dispose();
-            conn.Close();
-
-            conn.Open();
-            cmd = conn.CreateCommand();
-            cmd.CommandText = "select b.branch, coalesce(b.name, b.short) from svod2.branch b " +
-                "order by b.name;";
-            reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                SelectListItem item = new()
-                {
-                    Value = reader.GetInt32(0).ToString()
-                };
-                if (!reader.IsDBNull(1))
-                    item.Text = reader.GetString(1);
-                Okved.Add(item);
-            }
-            reader.Close();
-            cmd.Dispose();
-            conn.Close();
+            TerritoryWork = Pg.TerritoryWork;
+            Okved = Pg.Okved;
         }
 
         public IActionResult OnPostCancel()

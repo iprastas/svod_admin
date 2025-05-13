@@ -1,4 +1,6 @@
 ﻿using System.Data.Common;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Npgsql;
 using svod_admin.Pages.RegisterSubject;
 
@@ -9,8 +11,10 @@ namespace svod_admin
         IConfiguration config;
         public static string? connStr;
         public static readonly Dictionary<int, string> forms =new();
-        public static List<RegisterSubjectModel> SubjectList = new();
-        public static List<RegisterSubjectModel> CloseSubjectList = new();
+
+        public static List<SelectListItem> TerritoryWork { get; set; } = [];
+        public static List<SelectListItem> Okved { get; set; } = [];
+
 
         public static readonly Random random = new Random();
         public const string UppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -57,108 +61,43 @@ namespace svod_admin
             conn.Close();
 
             conn.Open();
-            NpgsqlCommand commOpen = conn.CreateCommand();
-            commOpen.CommandText = "select s.subject, s.master, " +
-                " (select coalesce(s.short,s.name) from svod2.subject where subject=s.master) mastername, " +
-                " coalesce(s.short,s.name), s.ogrn, s.kpp, s.inn, s.okpo, s.territorywork, t.name, " +
-                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate " +
-                " from svod2.subject s " +
-                " left join svod2.territory t on s.territorywork = t.territory " +
-                " left join svod2.branch b on s.okved = b.branch " +
-                " where coalesce(s.upto, current_date)>= current_date " +
-                " order by s.subject;";
-            reader = commOpen.ExecuteReader();
+            cmd = conn.CreateCommand();
+            cmd.CommandText = "select t.territory, t.name from svod2.territory t " +
+                " order by t.name;";
+            reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                RegisterSubjectModel user = new();
-                if (!reader.IsDBNull(0))
-                    user.SubjectID = reader.GetInt32(0);
+                SelectListItem item = new()
+                {
+                    Value = reader.GetInt32(0).ToString()
+                };
                 if (!reader.IsDBNull(1))
-                    user.MasterID = reader.GetInt32(1);
-                if (!reader.IsDBNull(2))
-                    user.MasterName = reader.GetString(2);
-                if (!reader.IsDBNull(3))
-                    user.SubjectName = reader.GetString(3);
-                if (!reader.IsDBNull(4))
-                    user.Ogrn = reader.GetString(4);
-                if (!reader.IsDBNull(5))
-                    user.Kpp = reader.GetString(5);
-                if (!reader.IsDBNull(6))
-                    user.Inn = reader.GetString(6);
-                if (!reader.IsDBNull(7))
-                    user.Okpo = reader.GetString(7);
-                if (!reader.IsDBNull(8))
-                    user.TerritoryWorkID = reader.GetInt32(8);
-                if (!reader.IsDBNull(9))
-                    user.TerritoryWork = reader.GetString(9);
-                if (!reader.IsDBNull(10))
-                    user.OkvedID = reader.GetInt32(10);
-                if (!reader.IsDBNull(11))
-                    user.Okved = reader.GetString(11);
-                if (!reader.IsDBNull(12))
-                    user.SinceDate = reader.GetDateTime(12);
-                if (!reader.IsDBNull(13))
-                    user.UptoDate = reader.GetDateTime(13);
-                if (!reader.IsDBNull(14))
-                    user.Username = reader.GetString(14);
-                if (!reader.IsDBNull(15))
-                    user.ChangeDate = reader.GetDateTime(15);
-
-                SubjectList.Add(user);
+                    item.Text = reader.GetString(1);
+                TerritoryWork.Add(item);
             }
+            reader.Close();
+            cmd.Dispose();
             conn.Close();
 
             conn.Open();
-            NpgsqlCommand commClose = conn.CreateCommand();
-            commClose.CommandText = "select s.subject, s.master, " +
-                " (select coalesce(s.short,s.name) from svod2.subject where subject=s.master) mastername, " +
-                " coalesce(s.short,s.name), s.ogrn, s.kpp, s.inn, s.okpo, s.territorywork, t.name, " +
-                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate " +
-                " from svod2.subject s " +
-                " left join svod2.territory t on s.territorywork = t.territory " +
-                " left join svod2.branch b on s.okved = b.branch " +
-                " where coalesce(s.upto, current_date) < current_date " +
-                " order by s.subject;";
-            reader = commClose.ExecuteReader();
+            cmd = conn.CreateCommand();
+            cmd.CommandText = "select b.branch, coalesce(b.name, b.short) from svod2.branch b " +
+                "order by b.name;";
+            reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                RegisterSubjectModel user = new();
-                if (!reader.IsDBNull(0))
-                    user.SubjectID = reader.GetInt32(0);
+                SelectListItem item = new()
+                {
+                    Value = reader.GetInt32(0).ToString()
+                };
                 if (!reader.IsDBNull(1))
-                    user.MasterID = reader.GetInt32(1);
-                if (!reader.IsDBNull(2))
-                    user.MasterName = reader.GetString(2);
-                if (!reader.IsDBNull(3))
-                    user.SubjectName = reader.GetString(3);
-                if (!reader.IsDBNull(4))
-                    user.Ogrn = reader.GetString(4);
-                if (!reader.IsDBNull(5))
-                    user.Kpp = reader.GetString(5);
-                if (!reader.IsDBNull(6))
-                    user.Inn = reader.GetString(6);
-                if (!reader.IsDBNull(7))
-                    user.Okpo = reader.GetString(7);
-                if (!reader.IsDBNull(8))
-                    user.TerritoryWorkID = reader.GetInt32(8);
-                if (!reader.IsDBNull(9))
-                    user.TerritoryWork = reader.GetString(9);
-                if (!reader.IsDBNull(10))
-                    user.OkvedID = reader.GetInt32(10);
-                if (!reader.IsDBNull(11))
-                    user.Okved = reader.GetString(11);
-                if (!reader.IsDBNull(12))
-                    user.SinceDate = reader.GetDateTime(12);
-                if (!reader.IsDBNull(13))
-                    user.UptoDate = reader.GetDateTime(13);
-                if (!reader.IsDBNull(14))
-                    user.Username = reader.GetString(14);
-                if (!reader.IsDBNull(15))
-                    user.ChangeDate = reader.GetDateTime(15);
-
-                CloseSubjectList.Add(user);
+                    item.Text = reader.GetString(1);
+                Okved.Add(item);
             }
+            reader.Close();
+            cmd.Dispose();
             conn.Close();
+
         }
 
     }

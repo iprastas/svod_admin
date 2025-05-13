@@ -251,7 +251,7 @@ function toggleClosedCompanies(checkbox) {
                             <td>${sub.username}</td>
                             <td>${sub.changeDate}</td>
                             <td>
-                                <form method="post" action="/RegisterSubject/RegisterSubject?handler=Edit&id=${sub.subjectID}">
+                                <form method="get" action="/RegisterSubject/EditSubject/${sub.subjectID}">
                                     <button type="submit" class="btn btn-outline-success actions" title="Изменить">
                                         <span>
                                             <img src="/pencil-square.svg" />
