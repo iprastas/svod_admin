@@ -91,7 +91,7 @@ namespace svod_admin
                     Value = reader.GetInt32(0).ToString()
                 };
                 if (!reader.IsDBNull(1))
-                    item.Text = reader.GetString(1);
+                    item.Text = reader.GetInt32(0).ToString() + " - " + reader.GetString(1);
                 Okved.Add(item);
             }
             reader.Close();
