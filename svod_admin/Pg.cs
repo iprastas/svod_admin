@@ -81,7 +81,7 @@ namespace svod_admin
 
             conn.Open();
             cmd = conn.CreateCommand();
-            cmd.CommandText = "select b.branch, coalesce(b.name, b.short) from svod2.branch b " +
+            cmd.CommandText = "select b.branch, b.code, coalesce(b.name, b.short) from svod2.branch b " +
                 "order by b.name;";
             reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -90,8 +90,8 @@ namespace svod_admin
                 {
                     Value = reader.GetInt32(0).ToString()
                 };
-                if (!reader.IsDBNull(1))
-                    item.Text = reader.GetInt32(0).ToString() + " - " + reader.GetString(1);
+                if (!reader.IsDBNull(1) && !reader.IsDBNull(2))
+                    item.Text = reader.GetString(1) + " - " + reader.GetString(2);
                 Okved.Add(item);
             }
             reader.Close();
