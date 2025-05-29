@@ -31,6 +31,7 @@ namespace svod_admin.Pages.RegisterSubject
         [BindProperty] public DateTime? UptoDate { get; set; }
         [BindProperty] public string Username { get; set; } = "";
         [BindProperty] public DateTime? ChangeDate { get; set; }
+        [BindProperty] public string PhoneNum { get; set; } = "";
 
         string? connectionString;
         readonly IConfiguration? configuration;
@@ -103,6 +104,7 @@ namespace svod_admin.Pages.RegisterSubject
                 ins.Append(Kpp != null ? "kpp," : ""); val.Append(Kpp != null ? "\'" + Kpp + "\'," : "");
                 ins.Append(Inn != null ? "inn," : ""); val.Append(Inn != null ? "\'" + Inn + "\'," : "");
                 ins.Append(Okpo != null ? "okpo," : ""); val.Append(Okpo != null ? "\'" + Okpo + "\'," : "");
+                ins.Append(PhoneNum != null ? "phone," : ""); val.Append(PhoneNum != null ? "\'" + PhoneNum + "\'," : "");
                 ins.Append("territorywork,"); val.Append($"{TerritoryWorkID},");
                 ins.Append(OkvedID != 0 ? "okved," : ""); val.Append(OkvedID != 0? $"{OkvedID}," : "");
                 ins.Append(SinceDate != null ? "since," : ""); val.Append(SinceDate != null ? "\'" + SinceDate + "\'," : "");

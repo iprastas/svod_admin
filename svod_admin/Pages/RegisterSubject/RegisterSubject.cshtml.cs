@@ -27,6 +27,7 @@ namespace svod_admin.Pages.RegisterSubject
         [BindProperty] public DateTime? UptoDate { get; set; }
         [BindProperty] public string Username { get; set; } = "";
         [BindProperty] public DateTime? ChangeDate { get; set; }
+        [BindProperty] public string PhoneNum { get; set; } = "";
 
         public List<RegisterSubjectModel> SubjectList = new();
         public List<RegisterSubjectModel> CloseSubjectList = new();
@@ -54,7 +55,7 @@ namespace svod_admin.Pages.RegisterSubject
             commOpen.CommandText = "select s.subject, s.master, " +
                 " (select coalesce(short,name) from svod2.subject where subject=s.master) mastername, " +
                 " coalesce(s.short,s.name), s.ogrn, s.kpp, s.inn, s.okpo, s.territorywork, t.name, " +
-                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate " +
+                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate, s.phone " +
                 " from svod2.subject s " +
                 " left join svod2.territory t on s.territorywork = t.territory " +
                 " left join svod2.branch b on s.okved = b.branch " +
@@ -96,6 +97,8 @@ namespace svod_admin.Pages.RegisterSubject
                     user.Username = reader.GetString(14);
                 if (!reader.IsDBNull(15))
                     user.ChangeDate = reader.GetDateTime(15);
+                if (!reader.IsDBNull(16))
+                    user.PhoneNum = reader.GetString(16);
 
                 SubjectList.Add(user);
             }
@@ -112,7 +115,7 @@ namespace svod_admin.Pages.RegisterSubject
             commClose.CommandText = "select s.subject, s.master, " +
                 " (select coalesce(short,name) from svod2.subject where subject=s.master) mastername, " +
                 " coalesce(s.short,s.name), s.ogrn, s.kpp, s.inn, s.okpo, s.territorywork, t.name, " +
-                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate " +
+                " s.okved, coalesce(b.short,b.name), s.since, s.upto, s.username, s.changedate, s.phone " +
                 " from svod2.subject s " +
                 " left join svod2.territory t on s.territorywork = t.territory " +
                 " left join svod2.branch b on s.okved = b.branch " +
@@ -154,6 +157,8 @@ namespace svod_admin.Pages.RegisterSubject
                     user.Username = reader.GetString(14);
                 if (!reader.IsDBNull(15))
                     user.ChangeDate = reader.GetDateTime(15);
+                if (!reader.IsDBNull(16))
+                    user.PhoneNum = reader.GetString(16);
 
                 CloseSubjectList.Add(user);
             }

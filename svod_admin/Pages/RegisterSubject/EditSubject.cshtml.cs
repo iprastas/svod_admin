@@ -27,6 +27,7 @@ namespace svod_admin.Pages.RegisterSubject
         [BindProperty] public int OkvedID { get; set; }
         [BindProperty] public DateTime? SinceDate { get; set; }
         [BindProperty] public DateTime? UptoDate { get; set; }
+        [BindProperty] public string PhoneNum { get; set; } = "";
 
         string? connectionString;
         readonly IConfiguration? configuration;
@@ -44,7 +45,7 @@ namespace svod_admin.Pages.RegisterSubject
             using NpgsqlConnection conn = new(connectionString);
             conn.Open();
             NpgsqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = $"select master,short,name,ogrn,kpp,inn,okpo,territorywork,okved,since,upto " +
+            cmd.CommandText = $"select master,short,name,ogrn,kpp,inn,okpo,territorywork,okved,since,upto,phone " +
                 $" from svod2.subject where subject={SubjectID}";
             NpgsqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -71,6 +72,8 @@ namespace svod_admin.Pages.RegisterSubject
                     SinceDate = reader.GetDateTime(9);
                 if (!reader.IsDBNull(10))
                     UptoDate = reader.GetDateTime(10);
+                if (!reader.IsDBNull(11))
+                    PhoneNum = reader.GetString(11);
             }
             reader.Close();
             cmd.Dispose();
@@ -113,7 +116,7 @@ namespace svod_admin.Pages.RegisterSubject
 
                 NpgsqlCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "update svod2.subject SET short=:shn,name=:n,ogrn=:ogrn,kpp=:kpp,inn=:inn,okpo=:okpo,"
-                        + "territorywork=:terw,okved=:okved,since=:since,upto=:upto,changer=:ch where subject=:s";
+                        + "territorywork=:terw,okved=:okved,since=:since,upto=:upto,changer=:ch,phone=:ph where subject=:s";
                 cmd.Parameters.Add(":shn", NpgsqlDbType.Varchar).Value = SubjectShortName != null ? SubjectShortName : DBNull.Value;
                 cmd.Parameters.Add(":n", NpgsqlDbType.Varchar).Value = SubjectName;
                 cmd.Parameters.Add(":ogrn", NpgsqlDbType.Varchar).Value = Ogrn != null ? Ogrn : DBNull.Value;
@@ -126,6 +129,7 @@ namespace svod_admin.Pages.RegisterSubject
                 cmd.Parameters.Add(":upto", NpgsqlDbType.Date).Value = UptoDate != null ? UptoDate : DBNull.Value;
                 cmd.Parameters.Add(":ch", NpgsqlDbType.Varchar).Value = "svod_admin";
                 cmd.Parameters.Add(":s", NpgsqlDbType.Integer).Value = id;
+                cmd.Parameters.Add(":ph", NpgsqlDbType.Varchar).Value = PhoneNum != null ? PhoneNum : DBNull.Value;
                 cmd.ExecuteNonQuery();
                 conn.Close();
 

@@ -21,13 +21,17 @@
 				<label for="SubjectID" class="form-label">ID</label>
 				<input type="text" value="@Model.SubjectID" class="form-control" name="SubjectID" asp-for="@Model.SubjectID" id="SubjectID" disabled>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-5">
 				<label for="inputName" class="form-label">Полное название*</label>
 				<input type="text" value="@Model.SubjectName" class="form-control" name="SubjectName" asp-for="@Model.SubjectShortName" id="inputSubName">
 			</div>
 			<div class="col-md-3">
 				<label for="inputShort" class="form-label">Короткое название*</label>
 				<input type="text" value="@Model.SubjectShortName" class="form-control" name="SubjectShortName" asp-for="@Model.SubjectShortName" id="inputShort" maxlength="250">
+			</div>
+			<div class="col-md-3">
+				<label for="inputPhone" class="form-label">Номер телефона</label>
+				<input type="text" class="form-control" name="PhoneNum" asp-for="@Model.PhoneNum" id="inputPhone" maxlength="11">
 			</div>
 		</div>
 		<div class="row mb-4">
